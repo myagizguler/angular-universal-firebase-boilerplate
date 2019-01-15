@@ -4,9 +4,17 @@
 /dist
 /tmp
 /out-tsc
+/public
+/.firebase
+
+# compiled functions
+functions/node_modules
+functions/ssr
+functions/lib
 
 # dependencies
 /node_modules
+
 
 # IDEs and editors
 /.idea
@@ -33,6 +41,7 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+package-lock.json
 
 # System Files
 .DS_Store
