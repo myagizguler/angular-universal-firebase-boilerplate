@@ -8,10 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "compile:server": "tsc -p server/tsconfig.functions.json",
-    "serve:ssr": "node functions/ssr",
-    "build:ssr": "npm run build:client-and-server-bundles && npm run compile:server",
-    "build:client-and-server-bundles": "ng build --prod && ng run project:server:production"
+    "build:ssr": "ng build --prod && ng run project:server:production"
   },
   "private": true,
   "dependencies": {
