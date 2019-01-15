@@ -8,6 +8,12 @@ A boilerplate for Angular project with Universal preinstalled and correctly conf
 $ git clone https://github.com/ribalnasr/angular-universal-firebase-functions-boilerplate YOUR_PROJECT_NAME
 ```
 
+Navigate to the project's folder
+
+```npm
+$ cd YOUR_PROJECT_NAME
+```
+
 Install dependencies in root and functions/ folder:
 
 ```npm
