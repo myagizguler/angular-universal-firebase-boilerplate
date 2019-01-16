@@ -26,6 +26,12 @@ An blank Angular app is inside src/ folder. Build Your website there.
 
 ## Deployment
 
+Make sure you have firebase-tools installed
+
+```npm
+$ npm i -g firebase-tools
+```
+
 Specify the firebase project your using:
 
 ```npm
