@@ -33,10 +33,10 @@ $ firebase use YOUR_PROJECT_ID
 ```
 
 Then deploy to firebase.
-Note: Deploying functions automatically build the ssr version into the functions/ folder.
+Note: Deploying functions automatically build the ssr version into the functions/lib folder, and the browser version into the public/ folder and then moves the index.html from the public folder to the functions folder.
 
 ```npm
-$ firebase deploy --only hosting,functions
+$ firebase deploy --only functions,hosting
 ```
 
 ## Development server
