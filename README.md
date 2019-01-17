@@ -1,6 +1,6 @@
 # Angular Universal Firebase Functions Boilerplate
 
-A boilerplate for Angular project with Universal preinstalled and correctly configured to deploy to Firebase Functions.
+A Firebase boilerplate for an Angular project with Universal preinstalled and correctly configured to deploy to Firebase Functions and Hosting.
 
 Comes with pre-installed:
 - Bootsrap & NgBootstrap (https://ng-bootstrap.github.io)
