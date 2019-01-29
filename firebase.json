@@ -1,6 +1,9 @@
 {
   "hosting": {
     "public": "public",
+    "predeploy": [
+      "npm run build:ssr"
+    ],
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -9,14 +12,12 @@
     "rewrites": [
       {
         "source": "**",
-        "function": "server1"
+        "function": "ssr"
       }
     ]
   },
   "functions": {
     "predeploy": [
-      "npm run build:ssr",
-      "mv public/index.html functions/lib/server/index.html",
       "npm --prefix \"$RESOURCE_DIR\" run lint",
       "npm --prefix \"$RESOURCE_DIR\" run build"
     ]
