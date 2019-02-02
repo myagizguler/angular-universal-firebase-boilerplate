@@ -26,7 +26,7 @@ $ npm i && cd functions && npm i && cd ..
 
 ## Usage
 
-An blank Angular app is inside src/ folder. Build Your website there.
+A blank Angular app is inside src/ folder. Build Your website there.
 
 ## Deployment
 
@@ -43,14 +43,14 @@ $ firebase use YOUR_PROJECT_ID
 ```
 
 Then deploy to firebase.
-Note: Deploying functions automatically build the ssr version into the functions/lib folder, and the browser version into the public/ folder and then moves the index.html from the public folder to the functions folder.
 
 ```npm
 $ firebase deploy --only functions,hosting
 ```
+Note: Deploying functions automatically pre-runs `npm run build:ssr` which builds the ssr version into the functions/lib folder and the browser version into the public/ folder, then moves the index.html from the public folder to the functions folder.
 
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-Note: Only deployed version is SEO-friendly. Development server uses the browser version for faster coding.
+Run `npm run fireserve` for the Universal server. Navigate to `http://localhost:5000/`. The app will not automatically reload when source files are modified. This command builds the universal version first by running `npm build:ssr`, then serves Firebase hosting and function by running `sudo firebase serve --only hosting,functions`. You might need to enter your password.
