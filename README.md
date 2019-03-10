@@ -4,7 +4,7 @@ A Firebase boilerplate for an Angular project with Universal preinstalled and co
 
 Comes with pre-installed:
 - Bootsrap & NgBootstrap (https://ng-bootstrap.github.io)
-- Angular/Fire2 (https://github.com/angular/angularfire2)
+- Angular/Fire (https://github.com/angular/angularfire2)
 
 ## Installation
 
