@@ -8,14 +8,13 @@
 /firebase-debug
 /public/*
 
-# compiled functions
-functions/node_modules
-functions/ssr
-functions/lib
+# Firebase
+/functions/lib
+*firebase-debug.log
 
 # dependencies
-/node_modules
-
+*node_modules
+/site/src/environments/environment.prod.ts
 
 # IDEs and editors
 /.idea
@@ -47,3 +46,7 @@ package-lock.json
 # System Files
 .DS_Store
 Thumbs.db
+src/environments/environment.prod.ts
+
+# Samsung TV App
+samsung-tv-app/.*
