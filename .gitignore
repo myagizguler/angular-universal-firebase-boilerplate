@@ -11,6 +11,7 @@
 # Firebase
 /functions/lib
 *firebase-debug.log
+.firebaserc
 
 # dependencies
 *node_modules
