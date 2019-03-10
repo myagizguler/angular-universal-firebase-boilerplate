@@ -47,6 +47,3 @@ package-lock.json
 .DS_Store
 Thumbs.db
 src/environments/environment.prod.ts
-
-# Samsung TV App
-samsung-tv-app/.*
