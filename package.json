@@ -1,58 +1,27 @@
 {
-  "name": "project",
-  "version": "0.0.0",
+  "name": "angular-universal-firebase-functions-boilerplate",
+  "version": "1.0.1",
+  "description": "",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e",
-    "build:ssr": "ng build --prod && ng run project:server:production && mv public/index.html functions/lib/server/index.html",
-    "fireserve": "npm run build:ssr && sudo firebase serve --only hosting,functions"
+    "init": "npm i && npm i --prefix ./functions && npm i --prefix ./site",
+    "serve": "npm run start --prefix ./site",
+    "fire:build:functions": "npm run build --prefix ./functions",
+    "fire:build:ssr": "npm run build:ssr --prefix ./site",
+    "fire:build": "npm run fire:build:functions && npm run fire:build:ssr",
+    "fire:serve": "sudo firebase serve --only hosting,functions",
+    "fire:serve:functions": "npm run fire:build:functions && sudo firebase serve --only functions",
+    "fire:build:serve": "npm run fire:build && npm run fire:serve",
+    "fire:deploy": "firebase deploy --only hosting,functions",
+    "fire:deploy:all": "firebase deploy"
   },
-  "private": true,
-  "dependencies": {
-    "@angular/animations": "^7.2.3",
-    "@angular/common": "^7.2.3",
-    "@angular/compiler": "^7.2.3",
-    "@angular/core": "^7.2.3",
-    "@angular/fire": "^5.1.1",
-    "@angular/forms": "^7.2.3",
-    "@angular/http": "^7.2.3",
-    "@angular/platform-browser": "^7.2.3",
-    "@angular/platform-browser-dynamic": "^7.2.3",
-    "@angular/platform-server": "^7.2.3",
-    "@angular/router": "^7.2.3",
-    "@ng-bootstrap/ng-bootstrap": "^4.0.2",
-    "@nguniversal/module-map-ngfactory-loader": "7.1.0",
-    "bootstrap": "^4.2.1",
-    "core-js": "^2.6.3",
-    "firebase": "^5.8.2",
-    "rxjs": "~6.4.0",
-    "tslib": "^1.9.0",
-    "zone.js": "~0.8.29"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ribalnasr/angular-universal-firebase-functions-boilerplate.git"
   },
-  "devDependencies": {
-    "@angular-devkit/build-angular": "~0.13.0",
-    "@angular/cli": "~7.3.0",
-    "@angular/compiler-cli": "^7.2.3",
-    "@angular/language-service": "^7.2.3",
-    "@types/jasmine": "~3.3.8",
-    "@types/jasminewd2": "~2.0.3",
-    "@types/node": "~10.12.21",
-    "codelyzer": "~4.5.0",
-    "jasmine-core": "~3.3.0",
-    "jasmine-spec-reporter": "~4.2.1",
-    "karma": "~4.0.0",
-    "karma-chrome-launcher": "~2.2.0",
-    "karma-coverage-istanbul-reporter": "~2.0.1",
-    "karma-jasmine": "~2.0.1",
-    "karma-jasmine-html-reporter": "^1.4.0",
-    "protractor": "~5.4.0",
-    "ts-loader": "^5.2.0",
-    "ts-node": "~8.0.2",
-    "tslint": "~5.12.1",
-    "typescript": "^3.2.4"
-  }
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ribalnasr/angular-universal-firebase-functions-boilerplate/issues"
+  },
+  "homepage": "https://github.com/ribalnasr/angular-universal-firebase-functions-boilerplate#readme"
 }
