@@ -2,7 +2,7 @@
   "hosting": {
     "public": "public",
     "predeploy": [
-      "npm run build:ssr"
+      "npm run fire:build:ssr"
     ],
     "ignore": [
       "firebase.json",
