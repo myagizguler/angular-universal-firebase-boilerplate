@@ -18,15 +18,15 @@ Navigate to the project's folder
 $ cd YOUR_PROJECT_NAME
 ```
 
-Install dependencies in root and functions/ folder:
+Install dependencies in root, site/ folder and functions/ folder, by running:
 
 ```npm
-$ npm i && cd functions && npm i && cd ..
+$ npm run init
 ```
 
 ## Usage
 
-A blank Angular app is inside src/ folder. Build Your website there.
+A blank Angular app is inside site/ folder. Build Your website there.
 
 ## Deployment
 
@@ -36,21 +36,33 @@ Make sure you have firebase-tools installed
 $ npm i -g firebase-tools
 ```
 
-Specify the firebase project your using:
+Login to firebase
+
+```npm
+$ firebase login
+```
+then follow the instructions in your browser
+
+Specify the firebase project you're using:
 
 ```npm
 $ firebase use YOUR_PROJECT_ID
 ```
 
 Then deploy to firebase.
+Note: Deploying functions automatically builds the ssr version into the functions/lib folder, and the browser version into the public/ folder and then moves the index.html from the public folder to the functions folder.
 
 ```npm
-$ firebase deploy --only functions,hosting
+$ npm run fire:deploy
 ```
-Note: Deploying functions automatically pre-runs `npm run build:ssr` which builds the ssr version into the functions/lib folder and the browser version into the public/ folder, then moves the index.html from the public folder to the functions folder.
+
+This will build and deploy functions and hosting files. To deploy everything run `npm run fire:deploy:all`.
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `npm run serve` for a dev server.
 
-Run `npm run fireserve` for the Universal server. Navigate to `http://localhost:5000/`. The app will not automatically reload when source files are modified. This command builds the universal version first by running `npm build:ssr`, then serves Firebase hosting and function by running `sudo firebase serve --only hosting,functions`. You might need to enter your password.
+## Production (SSR) server
+
+Run `npm run fire:build:serve` for the SSR server.
+Note: Production server does not auto-reload on file changes. You will have to build and serve again.
