@@ -1,4 +1,4 @@
-# Angular Universal Firebase Functions Boilerplate
+# Angular Universal Firebase Boilerplate
 
 A Firebase boilerplate for an Angular project with Universal preinstalled and correctly configured to deploy to Firebase Functions and Hosting.
 
