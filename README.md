@@ -28,7 +28,12 @@ $ npm run init
 
 A blank Angular app is inside site/ folder. Build Your website there.
 
-## Deployment
+
+## Development server
+
+Run `npm run serve` for a dev server. This is similar to running `ng serve` inside the /site folder.
+
+## Production (SSR) server
 
 Make sure you have firebase-tools installed
 
@@ -49,20 +54,21 @@ Specify the firebase project you're using:
 $ firebase use YOUR_PROJECT_ID
 ```
 
-Then deploy to firebase.
-Note: Deploying functions automatically builds the ssr version into the functions/lib folder, and the browser version into the public/ folder and then moves the index.html from the public folder to the functions folder.
+**Build SSR version**
+Run `npm run fire:build` to build the server version. (This will update files in /public and /functions/lib.)
 
+**serve SSR version**
+Run `npm run fire:serve` for the SSR server. (You might need to enter your user's password.)
+Note: Production server does not auto-reload on file changes. You will have to build and serve again.
+
+
+## Deployment
+Before deploying make sure to compile and build the latest changes to your code by running `npm run fire:build`.
+This automatically builds the SSR version into the functions/lib folder, and the browser version into the public/ folder and then moves the index.html from the public/ folder to the functions/lib/server folder.
+
+**To deploy the latest built files and functions:**
 ```npm
 $ npm run fire:deploy
 ```
 
-This will build and deploy functions and hosting files. To deploy everything run `npm run fire:deploy:all`.
-
-## Development server
-
-Run `npm run serve` for a dev server.
-
-## Production (SSR) server
-
-Run `npm run fire:build:serve` for the SSR server.
-Note: Production server does not auto-reload on file changes. You will have to build and serve again.
+This will deploy functions and hosting files. To deploy everything run `npm run fire:deploy:all`.
