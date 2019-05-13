@@ -36,8 +36,12 @@
     "zone.js": "~0.8.29"
   },
   "devDependencies": {
+    "firebase-functions-test": "^0.1.6",
     "tslint": "~5.12.1",
     "typescript": "3.2.4"
   },
-  "private": true
+  "private": true,
+  "engines": {
+    "node": "10"
+  }
 }
