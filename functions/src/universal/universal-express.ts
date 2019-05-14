@@ -1,3 +1,4 @@
+// tslint:disable-next-line:no-import-side-effect
 import 'zone.js/dist/zone-node';
 import * as express from 'express';
 import { enableProdMode as enableProd, Provider } from '@angular/core';
