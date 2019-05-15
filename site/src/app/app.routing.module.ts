@@ -24,12 +24,7 @@ if (environment.production) {
     {
       path: ':projectId/us-central1/ssr',
       redirectTo: '',
-      pathMatch: 'full'
-    },
-    {
-      path: ':projectId/us-central1/ssr/:route',
-      redirectTo: ':route',
-      pathMatch: 'full'
+      pathMatch: 'prefix'
     },
   ];
 }
