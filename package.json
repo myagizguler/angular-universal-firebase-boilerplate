@@ -8,7 +8,7 @@
     "fire:build:functions": "npm run lint --prefix ./functions && npm run build --prefix ./functions",
     "fire:build:ssr": "npm run build:ssr --prefix ./site",
     "fire:build": "npm run fire:build:functions && npm run fire:build:ssr",
-    "fire:serve": "firebase emulators:start",
+    "fire:serve": "firebase serve",
     "fire:build:serve": "npm run fire:build && npm run fire:serve",
     "fire:deploy": "firebase deploy --only hosting,functions",
     "fire:build:deploy": "npm run fire:build && npm run fire:deploy",
