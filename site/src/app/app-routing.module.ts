@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { environment } from '../environments/environment';
 
-let routes: Routes = [
+const routes: Routes = [
   {
     path: '',
     children: [
@@ -12,23 +11,14 @@ let routes: Routes = [
       }
     ]
   },
+  // The below route is required to run firebase serve locally.
+  {
+    path: ':projectId/us-central1/ssr',
+    redirectTo: '',
+    pathMatch: 'prefix'
+  },
+
 ];
-
-if (environment.production) {
-  // Required to run fire:serve locally.
-  routes = [
-    {
-      path: '',
-      children: routes
-    },
-    {
-      path: ':projectId/us-central1/ssr',
-      redirectTo: '',
-      pathMatch: 'prefix'
-    },
-  ];
-}
-
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

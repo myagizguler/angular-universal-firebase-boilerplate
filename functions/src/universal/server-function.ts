@@ -1,6 +1,6 @@
 import * as angularUniversal from './express-firebase';
 import { provideModuleMap } from '@nguniversal/module-map-ngfactory-loader';
-const { AppModuleNgFactory, LAZY_MODULE_MAP } = require('../server/main');
+const { LAZY_MODULE_MAP } = require('../server/main');
 
 export default angularUniversal.trigger({
 	index: __dirname + '/../server/index.html',

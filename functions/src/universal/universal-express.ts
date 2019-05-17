@@ -20,7 +20,7 @@ export interface ServerConfiguration {
  * @param file the file path to read
  */
 function readFile$(file: string): Observable<string> {
-  return Observable.create((observer: Observer<string>) => {
+  return new Observable((observer: Observer<string>) => {
     fs.readFile(file, 'utf8', (err, data) => {
       if(err) { 
         observer.error(err); 
