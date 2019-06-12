@@ -1,27 +1,22 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-
-const routes: Routes = [
-  {
-    path: '',
-    children: [
-      {
-        path: '',
-        loadChildren: './pages/home/home.module#HomeModule'
-      }
-    ]
-  },
-  // The below route is required to run firebase serve locally.
-  {
-    path: ':projectId/us-central1/ssr',
-    redirectTo: '',
-    pathMatch: 'prefix'
-  },
-
-];
+import { RouterModule } from '@angular/router';
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+	imports: [RouterModule.forRoot([
+		{
+			path: '',
+			loadChildren: './pages/dashboard/dashboard.module#DashboardModule'
+		},
+		{
+			path: 'login',
+			loadChildren: './pages/dashboard/dashboard.module#DashboardModule'
+		},
+		{
+			path: ':projectId/us-central1/ssr',
+			redirectTo: '',
+			pathMatch: 'prefix'
+		}
+	])],
+	exports: [RouterModule]
 })
 export class AppRoutingModule { }
