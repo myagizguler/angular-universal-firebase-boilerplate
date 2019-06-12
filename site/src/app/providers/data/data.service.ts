@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFlamelink } from 'angular-flamelink';
 import { Observable, combineLatest, Subscription } from 'rxjs';
-import { Member } from './types/member.interface';
+import { Article } from './types/article.interface';
 import { switchMap, map } from 'rxjs/operators';
 import { AngularFlamelinkTextSearch } from 'angular-flamelink-text-search';
 import { AngularFireFunctions } from '@angular/fire/functions';
@@ -17,6 +17,10 @@ export class DataService {
 		observer.next();
 	});
 
+	public get languageObservable() {
+		return this.$languageObservable;
+	}
+
 	public set languageObservable(observable: Observable<string>) {
 		this.$languageObservable = observable;
 		if (this.$languageSubscription) {
@@ -28,7 +32,6 @@ export class DataService {
 		});
 	}
 
-
 	constructor(
 		private flamelink: AngularFlamelink,
 		private flamelinkSearch: AngularFlamelinkTextSearch,
@@ -37,9 +40,6 @@ export class DataService {
 		if (!environment.production) {
 			this.fireFunctions.functions.useFunctionsEmulator('http://localhost:5001');
 		}
-
-
-
 	}
 
 
@@ -114,19 +114,19 @@ export class DataService {
 		);
 	}
 
-	public members() {
+	public news() {
 
-		const result = this.flamelink.valueChanges<Member>({
-			schemaKey: 'members',
-		}).pipe<Member[]>(
-			switchMap(members => {
+		const result = this.flamelink.valueChanges<Article>({
+			schemaKey: 'news',
+		}).pipe<Article[]>(
+			switchMap(articles => {
 				return Promise.all(
-					members.map(async member => (member.image && member.image[0])
+					articles.map(async article => (article.thumbnailImage && article.thumbnailImage[0])
 						? {
-							...member,
-							imageUrl: await this.getPhotoUrl(member.image[0].id, '1920_9999_100')
+							...article,
+							thumbnailImageUrl: await this.getPhotoUrl(article.thumbnailImage[0].id, '1920_9999_100')
 						}
-						: member
+						: article
 					)
 				);
 			})

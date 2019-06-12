@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { LanguageService } from 'src/app/providers/language/language.service';
+import { LanguageService } from '../../../providers/language/language.service';
+import { DataService } from 'src/app/providers/data/data.service';
 
 @Component({
 	selector: 'app-home',
@@ -8,8 +9,11 @@ import { LanguageService } from 'src/app/providers/language/language.service';
 })
 export class HomeComponent implements OnInit {
 
+	public news = this.data.news();
+
 	constructor(
-		private language: LanguageService
+		private language: LanguageService,
+		private data: DataService
 	) { }
 
 	ngOnInit() {
@@ -18,8 +22,5 @@ export class HomeComponent implements OnInit {
 	switchLanguage(language: string) {
 		this.language.language = language;
 	}
-
-
-
 
 }

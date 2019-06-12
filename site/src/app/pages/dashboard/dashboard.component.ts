@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Widgets } from 'open-dashboard';
 import { AngularFlamelink } from 'angular-flamelink';
 import { FlamelinkWidgets, FL_WIDGETS } from './flamelink-widgets.service';
-import { map, switchMap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { SplitDashboard } from './split-dashboard.service';
 import { LanguageService } from '../../providers/language/language.service';
 
@@ -21,7 +21,7 @@ export class DashboardComponent {
 				{
 					colClass: 'col-12 pb-4',
 					widget: FL_WIDGETS.FLCollectionList,
-					params: { schema: 'members' }
+					params: { schema: 'news' }
 				},
 			]
 		})

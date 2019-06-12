@@ -12,7 +12,8 @@
     "fire:build:serve": "npm run fire:build && npm run fire:serve",
     "fire:deploy": "firebase deploy --only hosting,functions",
     "fire:build:deploy": "npm run fire:build && npm run fire:deploy",
-    "fire:deploy:all": "firebase deploy"
+    "fire:deploy:all": "firebase deploy",
+    "fire:deploy:rules": "firebase deploy --only firestore:rules"
   },
   "repository": {
     "type": "git",
