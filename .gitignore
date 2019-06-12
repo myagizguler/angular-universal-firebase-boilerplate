@@ -16,6 +16,7 @@
 # dependencies
 *node_modules
 /site/src/environments/environment.prod.ts
+/site/src/environments/environment.ts
 
 # IDEs and editors
 /.idea
@@ -47,4 +48,3 @@ package-lock.json
 # System Files
 .DS_Store
 Thumbs.db
-src/environments/environment.prod.ts
