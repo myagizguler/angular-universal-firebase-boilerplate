@@ -432,7 +432,9 @@ export class FlamelinkWidgets {
 					case 'markdown-editor':
 						const markdownEditor: MarkdownEditorWidget = fieldStructure;
 						markdownEditor.type = 'markdown-editor';
-						markdownEditor.height = 'auto';
+						markdownEditor.height = '100px';
+						markdownEditor.hideIcons = ['Ul', 'Ol', 'Code', 'TogglePreview', 'FullScreen', 'Image'];
+
 						break;
 				}
 
