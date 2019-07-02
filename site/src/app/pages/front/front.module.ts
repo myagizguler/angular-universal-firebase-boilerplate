@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FrontRoutingModule } from './front-routing.module';
 import { FrontComponent } from './front.component';
 import { BootstrapDirectionComponent } from '../../providers/language/bootstrap-direction.component';
+import { LoaderModule } from '../../components/loader/loader.module';
 
 @NgModule({
 	declarations: [
@@ -13,6 +14,7 @@ import { BootstrapDirectionComponent } from '../../providers/language/bootstrap-
 	imports: [
 		CommonModule,
 		FrontRoutingModule,
+		LoaderModule
 	],
 	exports: [FrontComponent]
 })
