@@ -122,10 +122,11 @@ export class FlamelinkWidgets {
 				style: 'raised-button',
 				popupClose: true,
 				action: () => {
+					const password = data.password;
 					delete data.password;
 					return id
 						? this.flamelink.angularFire.collection('fl_users').doc(id).update(data)
-						: this.flamelink.auth.auth.createUserWithEmailAndPassword(data.email, data.password).then(
+						: this.flamelink.auth.auth.createUserWithEmailAndPassword(data.email, password).then(
 							credentials => this.flamelink.users.addToDB({
 								uid: credentials.user.uid,
 								data
