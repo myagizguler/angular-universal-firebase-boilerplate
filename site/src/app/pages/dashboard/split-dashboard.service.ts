@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Widgets, WidgetLinker } from 'open-dashboard';
+import { Widgets } from 'open-dashboard';
+import { WidgetLinker } from 'open-dashboard';
+import { LayoutCol } from 'open-dashboard/lib/widgets/ui/layout/layout.interface';
 
 @Injectable({
 	providedIn: 'root'
@@ -13,7 +15,8 @@ export class SplitDashboard {
 		allowAccess: false,
 		router: (segments, queryParams) => ({
 			widget: ''
-		})
+		}),
+		headerCols: []
 	};
 
 	private get loginWidgets(): Widgets {
@@ -88,7 +91,8 @@ export class SplitDashboard {
 						colClass: 'text-right',
 						widget: 'DashboardHeaderButtons'
 					},
-				]
+					...this.settings.headerCols
+				],
 			}),
 			DashboardHeaderButtons: () => ({
 				type: 'button',
@@ -168,5 +172,6 @@ export interface SplitDashboardSettings {
 	router: (segments: string[], queryParams: {
 		[key: string]: any;
 	}) => WidgetLinker;
+	headerCols?: LayoutCol[];
 }
 

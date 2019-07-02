@@ -5,10 +5,10 @@ import { Observable, combineLatest } from 'rxjs';
 import { DocumentReference } from '@angular/fire/firestore';
 import {
 	WidgetLinker, Widgets, FormWidget, SelectInputWidget, TextInputWidget, DateInputWidget,
-	RepeaterWidget, MarkdownEditorWidget, CardWidget
+	RepeaterWidget, MarkdownEditorWidget, CardWidget, Widget
 } from 'open-dashboard';
-import { FormGroup } from '@angular/forms';
 import { RepeaterList } from 'open-dashboard/lib/widgets/data/repeater/repeater.component';
+import { FormGroup } from '@angular/forms';
 
 export const FL_WIDGETS = {
 	FLMarkdown: 'FLMarkdown',
@@ -25,6 +25,15 @@ export const FL_WIDGETS = {
 	FLRepeaterSaveButton: 'FLRepeaterSaveButton',
 	FLFileInput: 'FLFileInput',
 	FLFileCard: 'FLFileCard',
+	// Permissions
+	FLPermissionsList: 'FLPermissionsList',
+	FLPermissionCard: 'FLPermissionCard',
+	FLPermissionsFormButton: 'FLPermissionsFormButton',
+	FLPermissionsForm: 'FLPermissionsForm',
+	PermissionSaveButton: 'PermissionSaveButton',
+	// Users
+	FLUsersForm: 'FLUsersForm',
+	FLUsersList: 'FLUsersList',
 };
 
 @Injectable({
@@ -37,6 +46,268 @@ export class FlamelinkWidgets {
 			observer.next();
 		})
 	};
+
+	public get usersWidgets(): Widgets {
+		return {
+			FLUsersList: {
+				type: 'repeater',
+				value: this.flamelink.angularFire.collection('fl_users').valueChanges(),
+				widget: (row, list) => ({
+					widget: 'FLUserCard',
+					params: { title: row.data.displayName, id: row.data.id }
+				}),
+				buttons: [
+					{
+						widget: 'FLUsersFormButton',
+					}
+				]
+			},
+			FLUserCard: ({ title, id }) => ({
+				type: 'card',
+				title,
+				cssClass: 'my-3',
+				buttons: [
+					{
+						widget: 'FLUsersFormButton',
+						params: { id }
+					}
+				]
+			}),
+			FLUsersFormButton: ({ id }) => ({
+				type: 'button',
+				title: id ? 'Update' : 'New User',
+				style: id ? 'flat-button' : 'raised-button',
+				icon: id ? 'edit' : 'add',
+				popup: {
+					widget: 'FLUsersForm',
+					params: { id }
+				}
+			}),
+			FLUsersForm: ({ id }) => ({
+				type: 'form',
+				value: id ? this.flamelink.angularFire.collection('fl_users').doc(id).valueChanges() : {},
+				fields: [
+					{ name: 'displayName', label: 'Display Name', type: 'text-input', required: true },
+					{ name: 'email', label: 'Email', type: 'text-input', required: true, },
+					{ name: 'password', label: 'Password', type: 'password-input', required: true, hidden: !!id },
+					{ name: 'firstName', label: 'First Name', type: 'text-input' },
+					{ name: 'lastName', label: 'Last Name', type: 'text-input' },
+					{
+						name: 'permissions', label: 'Permissions', type: 'select-input',
+						options: this.flamelink.angularFire.collection<any>('fl_permissions').valueChanges().pipe(map(profiles => profiles.map(profile => ({
+							value: this.flamelink.angularFire.collection('fl_permissions').doc(profile.id).ref, label: profile.name
+						})))),
+						compare: (option, selection) => (option.id === selection.id)
+					},
+					{
+						name: 'enabled', label: 'Enabled', type: 'select-input', options: [
+							{ label: 'Yes', value: 'Yes' },
+							{ label: 'No', value: 'No' },
+						]
+					},
+				],
+				buttons: [
+					form => ({
+						widget: 'FLUsersSaveButton',
+						params: { id, data: form.value }
+					})
+				]
+
+			}),
+			FLUsersSaveButton: ({ id, data }) => ({
+				type: 'button',
+				title: id ? 'Update User' : 'Create User',
+				cssClass: 'mt-5',
+				color: 'primary',
+				style: 'raised-button',
+				popupClose: true,
+				action: () => {
+					delete data.password;
+					return id
+						? this.flamelink.angularFire.collection('fl_users').doc(id).update(data)
+						: this.flamelink.auth.auth.createUserWithEmailAndPassword(data.email, data.password).then(
+							credentials => this.flamelink.users.addToDB({
+								uid: credentials.user.uid,
+								data
+							})
+						);
+				}
+			})
+
+		};
+	}
+
+	public get permissionsWidgets(): Widgets {
+
+		return {
+			FLPermissionsList: {
+				type: 'repeater',
+				value: this.flamelink.angularFire.collection('fl_permissions').valueChanges(),
+				widget: (row, list) => ({
+					widget: 'FLPermissionCard',
+					params: { title: row.data.name, id: row.data.id }
+				}),
+				buttons: [
+					{
+						widget: 'FLPermissionsFormButton',
+					}
+				]
+			},
+			FLPermissionCard: ({ title, id }) => ({
+				type: 'card',
+				title,
+				cssClass: 'my-3',
+				buttons: [
+					{
+						widget: 'FLPermissionsFormButton',
+						params: { id }
+					}
+				]
+			}),
+			FLPermissionsFormButton: ({ id }) => ({
+				type: 'button',
+				title: id ? 'Update' : 'New Permissions Profile',
+				style: id ? 'flat-button' : 'raised-button',
+				icon: id ? 'edit' : 'add',
+				popup: {
+					widget: 'FLPermissionsForm',
+					params: { id }
+				}
+			}),
+			FLPermissionsForm: ({ id }) => ({
+				type: 'form',
+				value: id ? this.flamelink.angularFire.collection('fl_permissions').doc(id).valueChanges() : {},
+				fields: this.flamelink.schemas.get().then((schemas: { [key: string]: any }) => {
+					const fields: Widget[] = [
+						{
+							type: 'text-input', name: 'name', label: 'Name', required: true
+						},
+						{
+							type: 'form', name: 'users', label: 'Manage Users', fields: [
+								{ type: 'slide-toggle', name: 'view', label: 'View' },
+								{ type: 'slide-toggle', name: 'create', label: 'Create' },
+								{ type: 'slide-toggle', name: 'update', label: 'Update' },
+								{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
+							]
+						},
+						{
+							type: 'form', name: 'permissions', label: 'Manage Permissions', fields: [
+								{ type: 'slide-toggle', name: 'view', label: 'View' },
+								{ type: 'slide-toggle', name: 'create', label: 'Create' },
+								{ type: 'slide-toggle', name: 'update', label: 'Update' },
+								{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
+							]
+						},
+						{
+							type: 'form', name: 'media', label: 'Manage Media', fields: [
+								{ type: 'slide-toggle', name: 'view', label: 'View' },
+								{ type: 'slide-toggle', name: 'create', label: 'Create' },
+								{ type: 'slide-toggle', name: 'update', label: 'Update' },
+								{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
+							]
+						},
+						{
+							type: 'form', name: 'schemas', label: 'Manage Schemas', fields: [
+								{
+									type: 'form', name: 'production', label: '', fields: [
+										{ type: 'slide-toggle', name: 'view', label: 'View' },
+										{ type: 'slide-toggle', name: 'create', label: 'Create' },
+										{ type: 'slide-toggle', name: 'update', label: 'Update' },
+										{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
+									]
+								}
+							]
+						},
+						{
+							type: 'form', name: 'content', label: 'Manage Content', fields: [
+								{
+									type: 'form', name: 'production', label: '', fields: Object.keys(schemas).map(key => {
+										return {
+											type: 'form', name: key, label: schemas[key].title, fields: [
+												{ type: 'slide-toggle', name: 'view', label: 'View' },
+												{ type: 'slide-toggle', name: 'create', label: 'Create' },
+												{ type: 'slide-toggle', name: 'update', label: 'Update' },
+												{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
+											]
+										} as Widget;
+									})
+								}
+							]
+						},
+						{
+							type: 'form', name: 'settings', label: '', fields: [
+								{
+									type: 'form', name: 'environments', label: 'Manage Environments', fields: [
+										{ type: 'slide-toggle', name: 'view', label: 'View' },
+										{ type: 'slide-toggle', name: 'create', label: 'Create' },
+										{ type: 'slide-toggle', name: 'update', label: 'Update' },
+										{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
+									]
+								},
+								{
+									type: 'form', name: 'locales', label: 'Manage Locales', fields: [
+										{ type: 'slide-toggle', name: 'view', label: 'View' },
+										{ type: 'slide-toggle', name: 'create', label: 'Create' },
+										{ type: 'slide-toggle', name: 'update', label: 'Update' },
+										{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
+									]
+								},
+								{
+									type: 'form', name: 'general', label: 'General', fields: [
+										{ type: 'slide-toggle', name: 'view', label: 'View' },
+										{ type: 'slide-toggle', name: 'create', label: 'Create' },
+										{ type: 'slide-toggle', name: 'update', label: 'Update' },
+										{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
+									]
+								},
+								{
+									type: 'form', name: 'global', label: 'Global', fields: [
+										{ type: 'slide-toggle', name: 'view', label: 'View' },
+										{ type: 'slide-toggle', name: 'create', label: 'Create' },
+										{ type: 'slide-toggle', name: 'update', label: 'Update' },
+										{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
+									]
+								},
+								{
+									type: 'form', name: 'backups', label: 'Backups', fields: [
+										{ type: 'slide-toggle', name: 'view', label: 'View' },
+										{ type: 'slide-toggle', name: 'create', label: 'Create' },
+										{ type: 'slide-toggle', name: 'update', label: 'Update' },
+										{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
+									]
+								},
+							]
+						},
+					];
+					return fields;
+				}),
+				buttons: [
+					form => ({
+						widget: 'FLPermissionSaveButton',
+						params: { id, data: form.value }
+					})
+				]
+			}),
+			FLPermissionSaveButton: ({ id, data }) => ({
+				type: 'button',
+				title: id ? 'Update Permissions' : 'Create Profile',
+				cssClass: 'mt-5',
+				color: 'primary',
+				style: 'raised-button',
+				popupClose: true,
+				action: () => {
+					// console.log(id, data);
+					id
+						? this.flamelink.angularFire.collection('fl_permissions').doc(id).update(data)
+						: this.flamelink.angularFire.collection('fl_permissions').add(data).then(documentRef => {
+							documentRef.update({
+								id: documentRef.id
+							});
+						});
+				}
+			})
+		};
+	}
 
 	public get defaultWidgets(): Widgets {
 		return {
@@ -225,7 +496,7 @@ export class FlamelinkWidgets {
 					content = row.data.label;
 					if (row.data.id) {
 						image = await this.flamelink.storage.getURL({ fileId: row.data.id });
-						content = await this.flamelink.storage.getFile({ fileId: row.data.id }).then(file => file.file + ' (' + file.contentType + ')');
+						content = await this.flamelink.storage.getFile({ fileId: row.data.id }).then(file => 'Type: ' + file.contentType);
 					}
 				}
 				// console.log(image);
@@ -255,7 +526,9 @@ export class FlamelinkWidgets {
 			};
 		}
 		return {
-			...this.defaultWidgets
+			...this.defaultWidgets,
+			...this.permissionsWidgets,
+			...this.usersWidgets,
 		};
 	}
 
@@ -269,7 +542,7 @@ export class FlamelinkWidgets {
 			schemaKey: schemaName,
 		}) : null;
 		if (fields) {
-			return fields.filter(field => field.show && field.type === 'text').map(field => field.key);
+			return fields.filter(field => field.show && (['text', 'email', 'markdown-editor'].indexOf(field.type) >= 0)).map(field => field.key);
 		}
 		return [];
 	}
@@ -468,6 +741,7 @@ export class FlamelinkWidgets {
 					observer.complete();
 				},
 				error => {
+					console.log(error);
 					observer.error(error);
 					observer.complete();
 				}
@@ -502,3 +776,4 @@ export interface ProgressFile {
 export interface FLDashboardSettings {
 	languageObservable?: Observable<any>;
 }
+

@@ -1,72 +1,139 @@
 service cloud.firestore {
   match /databases/{database}/documents {
   
-  	function userData() {
-       // return get(/databases/$(database)/documents/fl_users/9g3gCMB5mbXhY7boZNhQCVBvQ9I2).data;
-       return '1';
-    }
+  	function guestPermissions() {
+      return get(/databases/$(database)/documents/fl_permissions/0).data
+    }  
     
-    function userPermissionsProfile(profileId) {
-       return get(/databases/$(database)/documents/fl_permissions/$(profileId)).data;
+  	function permissionsById(id) {
+      return get(/databases/$(database)/documents/fl_permissions/$(id)).data
     }
   
-  	function getPermission(profileId, dataType, action) {
-    	profileId is '1';
-			return userPermissionsProfile(profileId)[dataType].production.news[action];
+  	function isContentPermitted(schema, action) {
+  	  return (
+				request.auth == null 
+    		&& guestPermissions().content.production[schema][action] == true
+      ) || (
+				request.auth != null 
+				&& permissionsById(request.auth.token.permissions).content.production[schema][action] == true
+      )
     }
     
+		function isCollectionPermitted(collection, action) {
+  	  return (
+				request.auth == null 
+    		&& guestPermissions()[collection][action] == true
+      ) || (
+				request.auth != null 
+				&& permissionsById(request.auth.token.permissions)[collection][action] == true
+      )
+    }
+  
+		function isCollectionPermittedProduction(collection, action) {
+  	  return (
+				request.auth == null 
+    		&& guestPermissions()[collection].production[action] == true
+      ) || (
+				request.auth != null 
+				&& permissionsById(request.auth.token.permissions)[collection].production[action] == true
+      )
+    }
+  
+		function isSettingsPermitted(settings, action) {
+  	  return (
+				request.auth == null 
+    		&& guestPermissions().settings[settings][action] == true
+      ) || (
+				request.auth != null 
+				&& permissionsById(request.auth.token.permissions).settings[settings][action] == true
+      )
+    }
+  
+    match /fl_content/{document=**} {
+      allow read: if isContentPermitted(resource.data._fl_meta_.schema, 'view');
+      allow update: if isContentPermitted(request.resource.data._fl_meta_.schema, 'update');
+      allow create: if isContentPermitted(request.resource.data._fl_meta_.schema, 'create');
+      allow delete: if isContentPermitted(resource.data._fl_meta_.schema, 'delete');
+    }
+    
+    match /fl_users/{document=**} {
+      allow read: if request.auth.uid == resource.id || isCollectionPermitted('users', 'view');
+      allow update: if (
+      	request.auth.uid == resource.id
+        || isCollectionPermitted('users', 'update')
+      ) && (
+        request.resource.data.permissions == resource.data.permissions
+      	|| isCollectionPermitted('permissions', 'update')
+      );
+      allow create: if isCollectionPermitted('users', 'create');
+      allow delete: if isCollectionPermitted('users', 'delete');
+    }    
+    
+    match /fl_permissions/{document=**} {
+      allow read: if isCollectionPermitted('permissions', 'view');
+      allow update: if isCollectionPermitted('permissions', 'update');
+      allow create: if isCollectionPermitted('permissions', 'create');
+      allow delete: if isCollectionPermitted('permissions', 'delete');
+    }
+
+  	match /fl_environments/{document=**} {
+      allow read: if isSettingsPermitted('environments', 'view');
+      allow update: if isSettingsPermitted('environments', 'update');
+      allow create: if isSettingsPermitted('environments', 'create');
+      allow delete: if isSettingsPermitted('environments', 'delete');
+    }    
+  	
+    match /fl_files/{document=**} {
+      allow read: if isCollectionPermitted('media', 'view');
+      allow update: if isCollectionPermitted('media', 'update');
+      allow create: if isCollectionPermitted('media', 'create');
+      allow delete: if isCollectionPermitted('media', 'delete');
+    }    
+  	
+    match /fl_folders/{document=**} {
+      allow read: if isCollectionPermitted('media', 'view');
+      allow update: if isCollectionPermitted('media', 'update');
+      allow create: if isCollectionPermitted('media', 'create');
+      allow delete: if isCollectionPermitted('media', 'delete');
+    }    
+  	
+    match /fl_locales/{document=**} {
+      allow read: if isSettingsPermitted('locales', 'view');
+      allow update: if isSettingsPermitted('locales', 'update');
+      allow create: if isSettingsPermitted('locales', 'create');
+      allow delete: if isSettingsPermitted('locales', 'delete');
+    }    
+  	
+    match /fl_schemas/{document=**} {
+      allow read: if isCollectionPermittedProduction('schemas', 'view');
+      allow update: if isCollectionPermittedProduction('schemas', 'update');
+      allow create: if isCollectionPermittedProduction('schemas', 'create');
+      allow delete: if isCollectionPermittedProduction('schemas', 'delete');
+    }    
+  	
+    match /fl_settings/{document=**} {
+      allow read: if isSettingsPermitted('general', 'view');
+      allow update: if isSettingsPermitted('general', 'update');
+      allow create: if isSettingsPermitted('general', 'create');
+      allow delete: if isSettingsPermitted('general', 'delete');
+    }
+    
+    // Temporary fix for flamelink cms
+      	
     match /{collection}/{document=**} {
-      allow read: if getPermission(userData(), 'content', 'view');
-      allow write;
-    }
-  }
-}
-
-const USER = {
-	id: 'USER_ID',
-	permissionsId: 'PERMISSIONS_1'
-}
-
-const permissions = {
-	id: 'PERMISSIONS_1',
-	content: {
-		view: true,
-		create: false,
-		update: false,
-		delete: false,
-	}
-}
-
-service cloud.firestore {
-  match /databases/{database}/documents {
-  
-  	function userPermissionsId() {
-       return get(/databases/$(database)/documents/users/USER_ID).data.permissionsId;
+      allow read: if 
+        // collection == 'fl_content' &&
+        collection != 'fl_users' &&
+        collection != 'fl_permissions' &&
+        collection != 'fl_environments' &&
+        collection != 'fl_files' &&
+        collection != 'fl_folders' &&
+        collection != 'fl_locales' &&
+        collection != 'fl_schemas' &&
+        collection != 'fl_settings' &&
+        request.auth != null;
     }
     
-    function userPermissions(id) {
-       return get(/databases/$(database)/documents/permissions/$(id)).data;
-    }
-  
-  	function getPermission(profileId, dataType, action) {
-		return userPermissions(profileId)[dataType][action];
-    }
-    
-    match /{collection}/{document=**} {
-	
-		// The below code returns true:
-		// allow read: if userPermissionsId() == 'PERMISSIONS_1'
-		// The above proves that the function userPermissionsId() is working properly and returning the permissions ID.
 
-		// The below code also returns true:
-		// allow read: if getPermission('PERMISSIONS_1', 'content', 'view');
-		// The above proves that the function getPermission() is working properly when recieving a correct ID.
-
-		// HOWEVER!! Combining the 2 won't work:
-		allow read: if getPermission(userPermissionsId(), 'content', 'view');
-		// This will throw the following error in the simulator:
-		// Error running simulation — Error: simulator.rules line [9], column [15]. Function not found error: Name: [get].; Error: Invalid argument provided to call. Function: [get], Argument: ["||invalid_argument||"]
-
-    }
   }
 }

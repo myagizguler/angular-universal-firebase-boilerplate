@@ -41,7 +41,7 @@
     "flamelink-text-search": "^0.0.7",
     "ng-mat-markdown-editor": "^0.0.8",
     "ngx-markdown": "^7.1.5",
-    "open-dashboard": "^0.2.29",
+    "open-dashboard": "^0.2.33",
     "reflect-metadata": "^0.1.12",
     "rxjs": "~6.4.0",
     "tslib": "^1.9.0",
