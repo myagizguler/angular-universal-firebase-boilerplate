@@ -43,7 +43,7 @@ export class FlamelinkWidgets {
 
 	private settings: FLDashboardSettings = {
 		languageObservable: new Observable(observer => {
-			observer.next();
+			observer.next('en-US');
 		})
 	};
 
@@ -375,7 +375,15 @@ export class FlamelinkWidgets {
 					type: 'form',
 					fields: schema ? this.getSchemaAutoForm(schema) : [],
 					value: id ? this.settings.languageObservable.pipe(
-						switchMap(() => this.flamelink.valueChanges({ schemaKey: schema, entryId: id }))
+						switchMap(lang =>
+							this.flamelink.angularFire
+								.collection(
+									'fl_content',
+									q => q.where('_fl_meta_.schema', '==', schema).where('_fl_meta_.fl_id', '==', id).where('_fl_meta_.locale', '==', lang))
+								.valueChanges().pipe(map(result => {
+									return result && result[0];
+								}))
+						)
 					) : {},
 					buttons
 				});
@@ -397,7 +405,7 @@ export class FlamelinkWidgets {
 								colClass: (layout === 'list' ? 'col-12' : 'col-6') + ' py-3',
 								params: {
 									schema,
-									id: document.id,
+									id: document._fl_meta_.fl_id,
 									title: document[fields[0]] || '',
 									image: document.imageUrl,
 									subtitle: document[fields[1]] || ''
