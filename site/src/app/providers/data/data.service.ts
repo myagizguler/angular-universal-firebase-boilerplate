@@ -4,8 +4,6 @@ import { Observable, combineLatest, Subscription } from 'rxjs';
 import { Article } from './types/article.interface';
 import { switchMap, map } from 'rxjs/operators';
 import { AngularFlamelinkTextSearch } from 'angular-flamelink-text-search';
-import { AngularFireFunctions } from '@angular/fire/functions';
-import { environment } from '../../../environments/environment';
 
 @Injectable({
 	providedIn: 'root'
@@ -35,12 +33,7 @@ export class DataService {
 	constructor(
 		private flamelink: AngularFlamelink,
 		private flamelinkSearch: AngularFlamelinkTextSearch,
-		private fireFunctions: AngularFireFunctions,
-	) {
-		if (!environment.production) {
-			this.fireFunctions.functions.useFunctionsEmulator('http://localhost:5001');
-		}
-	}
+	) { }
 
 
 

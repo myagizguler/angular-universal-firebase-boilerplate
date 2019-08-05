@@ -1,4 +1,4 @@
-# **KHC Data Provider**
+# **Data Provider**
 
 ## **Usage**
 
@@ -37,19 +37,18 @@ More info: https://www.npmjs.com/package/ngx-markdown
 ## **Methods**
 
 
-### **.members**(): Observable\<Member[]>
+### **.news**(): Observable\<Article[]>
 
-Returns an observable of an array of all members.
+Returns an observable of an array of all articles.
 
 
 ```ts
-Member {
+Article {
 	id: string;
-	name: string;
 	title: string;
-	description: string; // Markdown
-	image: DocumentReference[];
-	imageUrl: string;
+	thumbnailImage: DocumentReference;
+	thumbnailImageUrl: string;
+
 }
 ```
 
