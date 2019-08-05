@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { DataService } from './providers/data/data.service';
-import { LanguageService } from './providers/language/language.service';
-import { AuthenticationService } from './providers/authentication/authentication.service';
 import { Subscription } from 'rxjs';
+import { AuthenticationService } from './providers/authentication/authentication.service';
+import { Angulartics2GoogleAnalytics } from 'angulartics2/ga';
+import { DataToolsService } from './providers/data/data-tools.service';
+import { LanguageService } from './providers/language/language.service';
 
 @Component({
 	selector: 'app-root',
@@ -10,18 +11,21 @@ import { Subscription } from 'rxjs';
 	styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-	title = 'project';
+	title = 'Project Name';
+
 	private tokenSubscription: Subscription;
 
 	constructor(
-		private data: DataService,
-		private language: LanguageService,
+		private ga: Angulartics2GoogleAnalytics,
 		private auth: AuthenticationService,
+		private dataTools: DataToolsService,
+		private language: LanguageService,
 	) { }
 
 	ngOnInit() {
-		this.data.languageObservable = this.language.change;
+		this.ga.startTracking();
 		this.tokenSubscription = this.auth.refreshTokenOnAuthStateChange();
+		this.dataTools.languageObservable = this.language.change;
 	}
 
 	ngOnDestroy() {
@@ -29,4 +33,5 @@ export class AppComponent implements OnInit, OnDestroy {
 			this.tokenSubscription.unsubscribe();
 		}
 	}
+
 }

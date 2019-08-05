@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { LanguageService } from '../../../providers/language/language.service';
 import { DataService } from '../../../providers/data/data.service';
 import { LoadingComponent } from '../../../components/loader/loading.component';
@@ -9,10 +9,13 @@ import { LoaderService } from '../../../components/loader/loader.service';
 	templateUrl: './home.component.html',
 	styleUrls: ['./home.component.scss']
 })
-export class HomeComponent extends LoadingComponent implements OnInit {
+export class HomeComponent extends LoadingComponent implements OnInit, OnDestroy {
 
-	public news = this.data.news();
-	public loadingObservables = [this.news];
+	// Subscribe this.articles to the result of last query performs.
+	public articles = this.data.articles.result;
+
+	// Observables to wait for before stopping the loading indicator.
+	public loadingObservables = [this.articles];
 
 	constructor(
 		loader: LoaderService,
@@ -25,6 +28,14 @@ export class HomeComponent extends LoadingComponent implements OnInit {
 
 	ngOnInit() {
 		super.ngOnInit();
+		// Perform the default query and save the results to this.data.articles.results as an Observable of Articles.
+		this.data.articles.watch();
+		this.articles.subscribe(console.log);
+	}
+	ngOnDestroy() {
+		super.ngOnDestroy();
+		// Remember to destroy the subscription when the component is not using it anymore.
+		this.data.articles.stopWatching();
 	}
 
 	switchLanguage(language: string) {

@@ -12,7 +12,7 @@ import { RouterModule } from '@angular/router';
 			loadChildren: './pages/dashboard/dashboard.module#DashboardModule'
 		},
 		{
-			path: ':projectId/us-central1/ssr',
+			path: ':projectId/:region/ssr',
 			redirectTo: '',
 			pathMatch: 'prefix'
 		}

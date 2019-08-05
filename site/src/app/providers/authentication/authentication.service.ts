@@ -16,7 +16,7 @@ export class AuthenticationService {
 		return this.flamelink.auth.authState.subscribe(
 			async user => {
 				if (user) {
-					await this.functions.httpsCallable('refreshToken')({});
+					await this.functions.httpsCallable('refreshToken')({}).toPromise();
 					await user.getIdTokenResult(true);
 				}
 			}

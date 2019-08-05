@@ -7,10 +7,12 @@ import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { AngularFlamelinkTextSearchModule } from 'angular-flamelink-text-search';
 import { environment } from '../../../environments/environment';
+import { DataToolsService } from './data-tools.service';
 
 @NgModule({
 	providers: [
-		DataService
+		DataService,
+		DataToolsService,
 	],
 	imports: [
 		AngularFireModule.initializeApp(environment.firebase),
@@ -18,7 +20,7 @@ import { environment } from '../../../environments/environment';
 		AngularFireAuthModule,
 		AngularFireStorageModule,
 		AngularFlamelinkModule,
-		AngularFlamelinkTextSearchModule
+		AngularFlamelinkTextSearchModule,
 	],
 })
 export class DataModule { }
