@@ -14,7 +14,7 @@ const mergePackages = new Promise((resovle, reject) => {
 					...incomingPackage.dependencies,
 				}
 			}
-			resovle(JSON.stringify(newPackage));
+			resovle(JSON.stringify(newPackage, null, '\t'));
 		});
 	});
 
