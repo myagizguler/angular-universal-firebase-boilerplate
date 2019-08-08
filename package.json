@@ -5,18 +5,13 @@
   "scripts": {
     "init": "npm run package:merge --prefix ./functions && npm i && npm i --prefix ./functions && npm i --prefix ./site",
     "serve": "npm run start --prefix ./site",
-    "fire:build:functions": "npm run lint --prefix ./functions && npm run build --prefix ./functions",
-    "fire:build:ssr": "npm run build:ssr --prefix ./site",
-    "fire:build": "npm run fire:build:functions && npm run fire:build:ssr",
-    "fire:serve": "firebase serve",
-    "fire:build:serve": "npm run fire:build && npm run fire:serve",
-    "fire:deploy": "firebase deploy --only hosting,functions",
-    "fire:build:deploy": "npm run fire:build && npm run fire:deploy",
-    "fire:deploy:all": "firebase deploy",
-    "fire:deploy:rules": "firebase deploy --only firestore:rules",
-    "build": "npm run fire:build",
-    "serve:ssr": "npm run fire:serve",
-    "deploy": "npm run fire:deploy"
+    "build:functions": "npm run lint --prefix ./functions && npm run build --prefix ./functions",
+    "build:ssr": "npm run build:ssr --prefix ./site",
+    "build": "npm run build:functions && npm run build:ssr",
+    "deploy": "firebase deploy --only hosting,functions",
+    "deploy:all": "firebase deploy",
+    "deploy:rules": "firebase deploy --only firestore:rules",
+    "serve:ssr": "firebase serve"
   },
   "repository": {
     "type": "git",
