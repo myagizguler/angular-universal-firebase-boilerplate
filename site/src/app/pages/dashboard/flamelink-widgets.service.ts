@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFlamelink } from 'angular-flamelink';
 import { switchMap, map } from 'rxjs/operators';
-import { Observable, combineLatest } from 'rxjs';
+import { Observable, combineLatest, ReplaySubject } from 'rxjs';
 import { DocumentReference } from '@angular/fire/firestore';
 import {
 	WidgetLinker, Widgets, FormWidget, SelectInputWidget, TextInputWidget, DateInputWidget,
@@ -9,6 +9,7 @@ import {
 } from 'open-dashboard';
 import { RepeaterList } from 'open-dashboard/lib/widgets/data/repeater/repeater.component';
 import { FormGroup } from '@angular/forms';
+import { LayoutCol } from 'open-dashboard/lib/widgets/ui/layout/layout.interface';
 
 export const FL_WIDGETS = {
 	FLMarkdown: 'FLMarkdown',
@@ -18,6 +19,7 @@ export const FL_WIDGETS = {
 	FLDocumentForm: 'FLDocumentForm',
 	FLDocumentCard: 'FLDocumentCard',
 	FLCollectionList: 'FLCollectionList',
+	FLCollectionLoadMoreButton: 'FLCollectionLoadMoreButton',
 	FLSingleForm: 'FLSingleForm',
 	FLRepeaterCard: 'FLRepeaterCard',
 	FLRepeaterDeleteButton: 'FLRepeaterDeleteButton',
@@ -362,35 +364,71 @@ export class FlamelinkWidgets {
 				}) as FormWidget;
 			},
 
-			FLCollectionList: ({ schema, layout }) => ({
-				type: 'layout',
-				containerClass: 'p-0',
-				cols: this.settings.languageObservable.pipe(
-					switchMap(() => this.flamelink.valueChanges<any>({ schemaKey: schema }).pipe(switchMap(async members => {
-						const fields = await this.getOverviewFields(schema);
-						return [
-							{
-								colClass: 'col-12 text-right',
-								widget: FL_WIDGETS.FLDocumentFormButton,
-								params: { schema }
-							},
-							...members.map(document => ({
-								widget: FL_WIDGETS.FLDocumentCard,
-								colClass: (layout === 'list' ? 'col-12' : 'col-6') + ' py-3',
-								params: {
-									schema,
-									id: document._fl_meta_.fl_id,
-									title: document[fields[0]] || '',
-									image: document.imageUrl,
-									subtitle: document[fields[1]] || ''
-								}
-							}))
-						];
-					})))
-				),
-
-
+			FLCollectionLoadMoreButton: ({ limitObservable, limit }) => ({
+				type: 'button',
+				title: 'Load more',
+				action: () => {
+					limitObservable.next(limit);
+				}
 			}),
+
+			FLCollectionList: ({ schema, layout, limit }) => {
+				const queryOptions: any = {
+					schemaKey: schema,
+					orderBy: {
+						field: '_fl_meta_.createdDate',
+						order: 'desc',
+					},
+				};
+
+				const limitObservable = new ReplaySubject<number>();
+				if (limit) {
+					queryOptions.startAt = 0;
+				}
+
+				let count = 0;
+				limitObservable.next(limit);
+
+				return {
+					type: 'layout',
+					containerClass: 'p-0',
+					cols: this.settings.languageObservable.pipe(
+						switchMap(() => limitObservable),
+						switchMap($limit => this.flamelink.valueChanges<any>({
+							...queryOptions,
+							limit: $limit
+						})),
+						switchMap(async (documents) => {
+							count = documents.length;
+							const fields = await this.getOverviewFields(schema);
+							return [
+								{
+									colClass: 'col-12 text-right',
+									widget: FL_WIDGETS.FLDocumentFormButton,
+									params: { schema }
+								},
+								...documents.map(document => ({
+									widget: FL_WIDGETS.FLDocumentCard,
+									colClass: (layout === 'list' ? 'col-12' : 'col-6') + ' py-3',
+									params: {
+										schema,
+										id: document._fl_meta_.fl_id,
+										title: document[fields[0]] || '',
+										image: document.imageUrl,
+										subtitle: document[fields[1]] || ''
+									}
+								})),
+								{
+									colClass: 'col-12 text-center',
+									widget: FL_WIDGETS.FLCollectionLoadMoreButton,
+									params: { limitObservable, limit: count + limit }
+								},
+
+							];
+						})
+					)
+				};
+			},
 			FLDocumentCard: ({ schema, id, title, image, subtitle }) => ({
 				type: 'card',
 				title,
