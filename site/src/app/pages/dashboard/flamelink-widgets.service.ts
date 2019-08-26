@@ -551,7 +551,10 @@ export class FlamelinkWidgets {
 			schemaKey: schemaName,
 		}) : null;
 		if (fields) {
-			return fields.filter(field => field.show && (['text', 'email', 'markdown-editor'].indexOf(field.type) >= 0)).map(field => field.key);
+			return fields.filter(field =>
+				field.show &&
+				(['text', 'email', 'markdown-editor', 'number', 'select'].indexOf(field.type) >= 0)
+			).map(field => field.key);
 		}
 		return [];
 	}
