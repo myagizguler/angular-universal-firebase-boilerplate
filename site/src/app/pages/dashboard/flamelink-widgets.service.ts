@@ -18,6 +18,7 @@ export const FL_WIDGETS = {
 	FLDocumentForm: 'FLDocumentForm',
 	FLDocumentCard: 'FLDocumentCard',
 	FLCollectionList: 'FLCollectionList',
+	FLSingleForm: 'FLSingleForm',
 	FLRepeaterCard: 'FLRepeaterCard',
 	FLRepeaterDeleteButton: 'FLRepeaterDeleteButton',
 	FLRepeaterFormButton: 'FLRepeaterFormButton',
@@ -179,44 +180,20 @@ export class FlamelinkWidgets {
 				type: 'form',
 				value: id ? this.flamelink.angularFire.collection('fl_permissions').doc(id).valueChanges() : {},
 				fields: this.flamelink.schemas.get().then((schemas: { [key: string]: any }) => {
+					const toggles: Widget[] = [
+						{ type: 'slide-toggle', name: 'view', label: 'View' },
+						{ type: 'slide-toggle', name: 'create', label: 'Create' },
+						{ type: 'slide-toggle', name: 'update', label: 'Update' },
+						{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
+					];
 					const fields: Widget[] = [
-						{
-							type: 'text-input', name: 'name', label: 'Name', required: true
-						},
-						{
-							type: 'form', name: 'users', label: 'Manage Users', fields: [
-								{ type: 'slide-toggle', name: 'view', label: 'View' },
-								{ type: 'slide-toggle', name: 'create', label: 'Create' },
-								{ type: 'slide-toggle', name: 'update', label: 'Update' },
-								{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
-							]
-						},
-						{
-							type: 'form', name: 'permissions', label: 'Manage Permissions', fields: [
-								{ type: 'slide-toggle', name: 'view', label: 'View' },
-								{ type: 'slide-toggle', name: 'create', label: 'Create' },
-								{ type: 'slide-toggle', name: 'update', label: 'Update' },
-								{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
-							]
-						},
-						{
-							type: 'form', name: 'media', label: 'Manage Media', fields: [
-								{ type: 'slide-toggle', name: 'view', label: 'View' },
-								{ type: 'slide-toggle', name: 'create', label: 'Create' },
-								{ type: 'slide-toggle', name: 'update', label: 'Update' },
-								{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
-							]
-						},
+						{ type: 'text-input', name: 'name', label: 'Name', required: true },
+						{ type: 'form', name: 'users', label: 'Manage Users', fields: toggles },
+						{ type: 'form', name: 'permissions', label: 'Manage Permissions', fields: toggles },
+						{ type: 'form', name: 'media', label: 'Manage Media', fields: toggles },
 						{
 							type: 'form', name: 'schemas', label: 'Manage Schemas', fields: [
-								{
-									type: 'form', name: 'production', label: '', fields: [
-										{ type: 'slide-toggle', name: 'view', label: 'View' },
-										{ type: 'slide-toggle', name: 'create', label: 'Create' },
-										{ type: 'slide-toggle', name: 'update', label: 'Update' },
-										{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
-									]
-								}
+								{ type: 'form', name: 'production', label: '', fields: toggles }
 							]
 						},
 						{
@@ -224,12 +201,7 @@ export class FlamelinkWidgets {
 								{
 									type: 'form', name: 'production', label: '', fields: Object.keys(schemas).map(key => {
 										return {
-											type: 'form', name: key, label: schemas[key].title, fields: [
-												{ type: 'slide-toggle', name: 'view', label: 'View' },
-												{ type: 'slide-toggle', name: 'create', label: 'Create' },
-												{ type: 'slide-toggle', name: 'update', label: 'Update' },
-												{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
-											]
+											type: 'form', name: key, label: schemas[key].title, fields: toggles
 										} as Widget;
 									})
 								}
@@ -237,48 +209,20 @@ export class FlamelinkWidgets {
 						},
 						{
 							type: 'form', name: 'settings', label: '', fields: [
-								{
-									type: 'form', name: 'environments', label: 'Manage Environments', fields: [
-										{ type: 'slide-toggle', name: 'view', label: 'View' },
-										{ type: 'slide-toggle', name: 'create', label: 'Create' },
-										{ type: 'slide-toggle', name: 'update', label: 'Update' },
-										{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
-									]
-								},
-								{
-									type: 'form', name: 'locales', label: 'Manage Locales', fields: [
-										{ type: 'slide-toggle', name: 'view', label: 'View' },
-										{ type: 'slide-toggle', name: 'create', label: 'Create' },
-										{ type: 'slide-toggle', name: 'update', label: 'Update' },
-										{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
-									]
-								},
-								{
-									type: 'form', name: 'general', label: 'General', fields: [
-										{ type: 'slide-toggle', name: 'view', label: 'View' },
-										{ type: 'slide-toggle', name: 'create', label: 'Create' },
-										{ type: 'slide-toggle', name: 'update', label: 'Update' },
-										{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
-									]
-								},
-								{
-									type: 'form', name: 'global', label: 'Global', fields: [
-										{ type: 'slide-toggle', name: 'view', label: 'View' },
-										{ type: 'slide-toggle', name: 'create', label: 'Create' },
-										{ type: 'slide-toggle', name: 'update', label: 'Update' },
-										{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
-									]
-								},
-								{
-									type: 'form', name: 'backups', label: 'Backups', fields: [
-										{ type: 'slide-toggle', name: 'view', label: 'View' },
-										{ type: 'slide-toggle', name: 'create', label: 'Create' },
-										{ type: 'slide-toggle', name: 'update', label: 'Update' },
-										{ type: 'slide-toggle', name: 'delete', label: 'Delete' },
-									]
-								},
+								{ type: 'form', name: 'environments', label: 'Manage Environments', fields: toggles },
+								{ type: 'form', name: 'locales', label: 'Manage Locales', fields: toggles },
+								{ type: 'form', name: 'general', label: 'General', fields: toggles },
+								{ type: 'form', name: 'globals', label: 'Globals', fields: toggles },
+								{ type: 'form', name: 'backups', label: 'Backups', fields: toggles },
+								{ type: 'form', name: 'workflows', label: 'Workflows', fields: toggles },
 							]
 						},
+						{
+							type: 'form', name: 'navigation', label: 'Navigation', fields: [
+								{ type: 'form', name: 'production', label: '', fields: toggles }
+							]
+						},
+
 					];
 					return fields;
 				}),
@@ -323,6 +267,7 @@ export class FlamelinkWidgets {
 				color: 'primary',
 				popupClose: true,
 				disabled: !valid,
+				submit: true,
 				action: () => {
 					valid = false;
 					// console.log(schema, id, data);
@@ -356,7 +301,7 @@ export class FlamelinkWidgets {
 					params: { schema, id }
 				}
 			}),
-			FLDocumentForm: ({ schema, id }) => {
+			FLDocumentForm: async ({ schema, id }) => {
 				const buttons: any[] = [
 					(form: FormGroup) => ({
 						widget: FL_WIDGETS.FLDocumentSaveButton,
@@ -371,9 +316,12 @@ export class FlamelinkWidgets {
 					});
 				}
 
+				const fields = schema ? await this.getSchemaAutoForm(schema) : [];
+				const linkedFields = fields.filter(field => !!field.linkedField);
+
 				return ({
 					type: 'form',
-					fields: schema ? this.getSchemaAutoForm(schema) : [],
+					fields,
 					value: id ? this.settings.languageObservable.pipe(
 						switchMap(lang =>
 							this.flamelink.angularFire
@@ -381,13 +329,39 @@ export class FlamelinkWidgets {
 									'fl_content',
 									q => q.where('_fl_meta_.schema', '==', schema).where('_fl_meta_.fl_id', '==', id).where('_fl_meta_.locale', '==', lang))
 								.valueChanges().pipe(map(result => {
+									// console.log(lang);
 									return result && result[0];
 								}))
 						)
 					) : {},
-					buttons
-				});
+					buttons,
+					onChange: (form) => {
+						linkedFields.forEach(field => {
+							const newValue = { ...form.value };
+							newValue[field.name] = form.value[field.linkedField];
+							form.setValue(newValue, { emitEvent: false });
+						});
+					}
+				}) as FormWidget;
 			},
+			FLSingleForm: async ({ schema }) => {
+				const doc = await this.flamelink.content.get({ schemaKey: schema });
+				const id = doc ? doc.id : null;
+				return ({
+					type: 'form',
+					fields: schema ? this.getSchemaAutoForm(schema) : [],
+					value: this.settings.languageObservable.pipe(switchMap(() => this.flamelink.valueChanges<any>({
+						schemaKey: schema, entryId: null
+					}))),
+					buttons: [
+						form => ({
+							widget: FL_WIDGETS.FLDocumentSaveButton,
+							params: { data: form.value, schema, id, valid: form.valid }
+						})
+					]
+				}) as FormWidget;
+			},
+
 			FLCollectionList: ({ schema, layout }) => ({
 				type: 'layout',
 				containerClass: 'p-0',
@@ -560,7 +534,6 @@ export class FlamelinkWidgets {
 	}
 
 	public async getSchemaAutoForm(schemaName: string) {
-		// console.log(schemaName);
 		const fields = await this.flamelink.schemas.getFields({
 			schemaKey: schemaName,
 		});
@@ -571,7 +544,6 @@ export class FlamelinkWidgets {
 	}
 
 	public flSchemaToAutoForm(fields: any[]) {
-		// console.log(schemaStructure);
 		return fields
 			.filter(field => !field.hidden)
 			.map(field => {
@@ -720,6 +692,23 @@ export class FlamelinkWidgets {
 						markdownEditor.height = '100px';
 						markdownEditor.hideIcons = ['Ul', 'Ol', 'Code', 'TogglePreview', 'FullScreen', 'Image'];
 
+						break;
+
+					case 'location':
+						const locationInputWidget: FormWidget = fieldStructure;
+						locationInputWidget.type = 'form';
+						locationInputWidget.fields = [
+							{
+								name: 'lat',
+								label: 'Latitude',
+								type: 'text-input',
+							},
+							{
+								name: 'lng',
+								label: 'Longitude',
+								type: 'text-input'
+							}
+						];
 						break;
 				}
 
