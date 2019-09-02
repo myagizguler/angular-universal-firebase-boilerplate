@@ -56,20 +56,21 @@ $ firebase use YOUR_PROJECT_ID
 ```
 
 **Build SSR version**
-Run `npm run fire:build` to build the server version. (This will update files in /public and /functions/lib.)
+Run `npm run init` to merge site/package.json to functions/package.json.
+Then run `npm run build` to build the server version. (This will update files in /public and /functions/lib.)
 
 **serve SSR version**
-Run `npm run fire:serve` for the SSR server. (You might need to enter your user's password.)
+Run `npm run serve:ssr` for the SSR server. (You might need to enter your user's password.)
 Note: Production server does not auto-reload on file changes. You will have to build and serve again.
 
 
 ## Deployment
-Before deploying make sure to compile and build the latest changes to your code by running `npm run fire:build`.
+Before deploying make sure to compile and build the latest changes to your code by running `npm run build`.
 This automatically builds the SSR version into the functions/lib folder, and the browser version into the public/ folder and then moves the index.html from the public/ folder to the functions/lib/server folder.
 
 **To deploy the latest built files and functions:**
 ```npm
-$ npm run fire:deploy
+$ npm run deploy
 ```
 
-This will deploy functions and hosting files. To deploy everything run `npm run fire:deploy:all`.
+This will deploy functions and hosting files. To deploy everything run `npm run deploy:all`.
