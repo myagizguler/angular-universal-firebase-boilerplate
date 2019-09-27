@@ -20,8 +20,22 @@ export class FLContentWidgets {
         private flContent: FLContentService
     ) { }
 
-    public get(): Widgets {
+    public get(routePrefix = 'admin'): Widgets {
         return {
+            FLSideMenuButton: ({ schema }) => ({
+                type: 'button',
+                title: schema.title,
+                navigate: { commands: ['/', routePrefix, schema.type, schema.id] }
+
+            }),
+            FLSideMenu: {
+                type: 'repeater',
+                value: this.flamelink.angularFire.collection('fl_schemas', q => q.where('enabled', '==', true)).valueChanges(),
+                widget: (row) => ({
+                    widget: 'FLSideMenuButton',
+                    params: { schema: row.data }
+                })
+            },
             FLDocumentSaveButton: ({ schema, id, formGroup, onSave, onSubmit, title }) => ({
                 type: 'button',
                 title: title || 'Save',
@@ -143,6 +157,8 @@ export class FLContentWidgets {
             }),
 
             FLCollectionList: ({ schema, layout, limit }) => {
+
+                console.log(schema);
                 const queryOptions: any = {
                     schemaKey: schema,
                     orderBy: {

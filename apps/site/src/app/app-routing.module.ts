@@ -6,15 +6,6 @@ import { RouterModule } from '@angular/router';
 		{
 			path: '',
 			loadChildren: './pages/dashboard/dashboard.module#DashboardModule'
-		},
-		{
-			path: 'login',
-			loadChildren: './pages/dashboard/dashboard.module#DashboardModule'
-		},
-		{
-			path: ':projectId/:region/ssr',
-			redirectTo: '',
-			pathMatch: 'prefix'
 		}
 	])],
 	exports: [RouterModule]

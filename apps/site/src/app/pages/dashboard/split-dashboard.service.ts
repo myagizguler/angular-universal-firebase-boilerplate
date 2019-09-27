@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Widgets } from 'open-dashboard';
+import { Widgets, Widget } from 'open-dashboard';
 import { WidgetLinker } from 'open-dashboard';
 import { LayoutCol } from 'open-dashboard/lib/widgets/ui/layout/layout.interface';
 
@@ -10,13 +10,15 @@ import { LayoutCol } from 'open-dashboard/lib/widgets/ui/layout/layout.interface
 export class SplitDashboard {
 
 	private settings: SplitDashboardSettings = {
+		routePrefix: 'admin',
 		login: (email, password) => { },
 		logout: () => { },
 		allowAccess: false,
 		router: (segments, queryParams) => ({
 			widget: ''
 		}),
-		headerCols: []
+		headerCols: [],
+		sideMenu: 'DefaultSideMenu'
 	};
 
 	private get loginWidgets(): Widgets {
@@ -63,22 +65,65 @@ export class SplitDashboard {
 					return this.settings.login(email, password);
 				}
 			}),
-			SplitDashboard: () => ({
-				type: 'params-reader',
-				widget: (segments) => segments[0] === 'login'
-					? ({
-						widget: 'LoginPage',
-					})
-					: ({
-						widget: 'AuthRedirect',
-					})
-			})
-
 		};
 	}
 
 	private get dashboardWidgets(): Widgets {
 		return {
+			Dashboard: {
+				type: 'params-reader',
+				widget: (segments) => segments[0] === this.settings.routePrefix
+					? ({
+						widget: 'AuthRedirect',
+						params: { loggedInWidget: 'FullDashboard', loggedOutWidget: 'LoginPage' }
+					})
+					: ({
+						widget: 'AuthRedirect',
+						params: { loggedInWidget: 'SplitDashboard', loggedOutWidget: 'FrontSite' }
+					})
+
+			},
+			AuthRedirect: ({ loggedInWidget, loggedOutWidget }) => ({
+				type: 'dynamic',
+				data: this.settings.allowAccess,
+				widget: allow => {
+					return ({
+						widget: !!allow ? loggedInWidget : loggedOutWidget,
+					});
+				}
+			}),
+			SplitDashboard: {
+				type: 'drawer',
+				width: '600px',
+				position: 'end',
+				drawer: {
+					widget: 'BodyWrapper'
+				},
+				content: {
+					widget: 'FrontSite'
+				}
+			},
+			FullDashboard: {
+				type: 'drawer',
+				width: '200px',
+				position: 'start',
+				drawer: {
+					widget: this.settings.sideMenu
+				},
+				content: {
+					widget: 'BodyWrapper'
+				}
+
+			},
+			DefaultSideMenu: {
+				type: 'markdown',
+				content: 'Sidemenu is not configured'
+			},
+
+
+
+
+			///// BODY
 			DashboardHeader: () => ({
 				type: 'layout',
 				cols: [
@@ -100,7 +145,7 @@ export class SplitDashboard {
 				icon: 'logout',
 				action: () => this.settings.logout()
 			}),
-			Dashboard: () => ({
+			BodyWrapper: () => ({
 				type: 'layout',
 				containerClass: 'p-3',
 				rowClass: 'm-0',
@@ -117,28 +162,7 @@ export class SplitDashboard {
 			}),
 			FrontSite: () => ({
 				type: 'router-outlet',
-			}),
-			Splitter: () => ({
-				type: 'drawer',
-				width: '600px',
-				position: 'end',
-				drawer: {
-					widget: 'Dashboard'
-				},
-				content: {
-					widget: 'FrontSite'
-				}
-
-			}),
-			AuthRedirect: () => ({
-				type: 'dynamic',
-				data: this.settings.allowAccess,
-				widget: allow => {
-					return ({
-						widget: !!allow ? 'Splitter' : 'FrontSite',
-					});
-				}
-			}),
+			})
 		};
 	}
 
@@ -168,10 +192,12 @@ export class SplitDashboard {
 export interface SplitDashboardSettings {
 	login: (email: string, password: string) => any;
 	logout: () => any;
+	routePrefix?: string;
 	allowAccess: boolean | Promise<boolean> | Observable<boolean>;
 	router: (segments: string[], queryParams: {
 		[key: string]: any;
 	}) => WidgetLinker;
 	headerCols?: LayoutCol[];
+	sideMenu?: string;
 }
 

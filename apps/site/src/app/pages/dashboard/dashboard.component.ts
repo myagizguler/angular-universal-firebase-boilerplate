@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { Widgets } from 'open-dashboard';
 import { AngularFlamelink } from 'angular-flamelink';
 import { map } from 'rxjs/operators';
@@ -9,9 +9,12 @@ import { FL_WIDGETS, FLWidgets } from '../../providers/fl-widgets';
 @Component({
 	selector: 'app-dashboard',
 	templateUrl: './dashboard.component.html',
-	styleUrls: ['./dashboard.component.scss']
+	styleUrls: ['./dashboard.component.scss'],
+	encapsulation: ViewEncapsulation.None
 })
 export class DashboardComponent {
+
+	private routePrefix = 'admin';
 
 	private menuWidgets: Widgets = {
 		Menu: {
@@ -60,12 +63,15 @@ export class DashboardComponent {
 
 	public widgets: Widgets = {
 		...this.flWidgets.widgets({
-			languageObservable: this.language.change
+			languageObservable: this.language.change,
+			routePrefix: this.routePrefix
 		}),
 		...this.splitDashboard.widgets({
 			login: (email, password) => this.flamelink.auth.auth.signInWithEmailAndPassword(email, password),
 			logout: () => this.flamelink.auth.auth.signOut(),
+			routePrefix: this.routePrefix,
 			allowAccess: this.flamelink.auth.user.pipe(map(user => !!user)),
+			sideMenu: 'FLSideMenu',
 			headerCols: [
 				{
 					colClass: 'col-12 border-bottom admin-menu',
@@ -88,15 +94,35 @@ export class DashboardComponent {
 				}
 
 				switch (segments[0]) {
+					case this.routePrefix:
+
+						switch (segments[1]) {
+							case 'collection':
+								return {
+									widget: FL_WIDGETS.FLCollectionList,
+									params: { schema: segments[2] }
+								}
+							case 'form':
+								return {
+									widget: FL_WIDGETS.FLCollectionList,
+									params: { schema: segments[2] }
+								}
+							case 'single':
+								return {
+									widget: FL_WIDGETS.FLSingleForm,
+									params: { schema: segments[2] }
+								}
+						}
+
 					case undefined:
 						return ({
 							widget: 'HomePage',
 						});
 					default:
-						return ({
+						return {
 							widget: FL_WIDGETS.FLMarkdown,
 							params: { content: `**This page has no settings.**` }
-						});
+						};
 				}
 			}
 		}),

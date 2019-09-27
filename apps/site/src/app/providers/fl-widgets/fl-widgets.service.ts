@@ -8,6 +8,7 @@ import { FLLanguageService } from './utils/language.service';
 
 export interface FLDashboardSettings {
   languageObservable?: Observable<any>;
+  routePrefix?: string;
 }
 
 @Injectable({
@@ -18,7 +19,8 @@ export class FLWidgets {
   private defaultSettings: FLDashboardSettings = {
     languageObservable: new Observable(observer => {
       observer.next('en-US');
-    })
+    }),
+    routePrefix: 'admin'
   };
 
   public widgets(settings: FLDashboardSettings = {}) {
@@ -30,7 +32,7 @@ export class FLWidgets {
     this.language.valueChanges = settings.languageObservable;
 
     return {
-      ...this.contentWidgets.get(),
+      ...this.contentWidgets.get(settings.routePrefix),
       ...this.permissionsWidgets.get(),
       ...this.usersWidgets.get(),
       ...this.fieldsWidgets.get(),
