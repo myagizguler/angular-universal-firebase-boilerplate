@@ -4,7 +4,7 @@ const mergePackages = new Promise((resovle, reject) => {
 	fs.readFile('package.json', (err, data) => {
 		if (err) reject(err);
 		const initPackage = JSON.parse(data);
-		fs.readFile('../site/package.json', (err, data) => {
+		fs.readFile('../apps/site/package.json', (err, data) => {
 			if (err) reject(err);
 			const incomingPackage = JSON.parse(data);
 			const newPackage = {

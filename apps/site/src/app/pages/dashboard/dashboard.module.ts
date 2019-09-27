@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 
 import { DashboardComponent } from './dashboard.component';
 import { DashboardRoutingModule } from './dashboard-routing.module';
-import { FlamelinkWidgets } from './flamelink-widgets.service';
 import { SplitDashboard } from './split-dashboard.service';
 import { WidgetModule } from 'open-dashboard';
+import { FLWidgetsModule } from '../../providers/fl-widgets';
 
 @NgModule({
 
@@ -18,7 +18,7 @@ import { WidgetModule } from 'open-dashboard';
 		WidgetModule
 	],
 	providers: [
-		FlamelinkWidgets,
+		FLWidgetsModule,
 		SplitDashboard
 	],
 	exports: [DashboardComponent]

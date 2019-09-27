@@ -1,8 +1,7 @@
-import universal from './universal/server-function';
 import { flConfig, flSearchFireFunction } from 'flamelink-text-search';
 import { firebaseApp, functions, firestore } from './firebase';
 
-export const ssr = universal;
+export * from './ssr';
 
 flConfig(firebaseApp);
 export const search = flSearchFireFunction;

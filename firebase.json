@@ -1,18 +1,21 @@
 {
-  "hosting": {
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "function": "ssr"
-      }
-    ]
-  },
+  "hosting": [
+    {
+      "target": "site",
+      "public": "public/site",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "function": "siteSSR"
+        }
+      ]
+    }
+  ],
   "functions": {
     "source": "functions"
   },

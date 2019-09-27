@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { Widgets } from 'open-dashboard';
 import { AngularFlamelink } from 'angular-flamelink';
-import { FlamelinkWidgets, FL_WIDGETS } from './flamelink-widgets.service';
 import { map } from 'rxjs/operators';
 import { SplitDashboard } from './split-dashboard.service';
 import { LanguageService } from '../../providers/language/language.service';
+import { FL_WIDGETS, FLWidgets } from '../../providers/fl-widgets';
 
 @Component({
 	selector: 'app-dashboard',
@@ -12,6 +12,36 @@ import { LanguageService } from '../../providers/language/language.service';
 	styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
+
+	private menuWidgets: Widgets = {
+		Menu: {
+			type: 'repeater',
+			value: [
+				{ title: 'Content' },
+				{ settings: 'users', title: 'Users' },
+				{ settings: 'permissions', title: 'Permissions' },
+			],
+			widget: row => ({
+				widget: 'MenuButton',
+				params: row.data
+			})
+		},
+		MenuButton: ({ title, settings }) => ({
+			type: 'button',
+			title,
+			navigate: {
+				commands: [],
+				extras: {
+					queryParams: settings
+						? {
+							settings,
+							title
+						}
+						: {}
+				}
+			}
+		}),
+	};
 
 
 	private homeWidgets: Widgets = {
@@ -36,7 +66,27 @@ export class DashboardComponent {
 			login: (email, password) => this.flamelink.auth.auth.signInWithEmailAndPassword(email, password),
 			logout: () => this.flamelink.auth.auth.signOut(),
 			allowAccess: this.flamelink.auth.user.pipe(map(user => !!user)),
+			headerCols: [
+				{
+					colClass: 'col-12 border-bottom admin-menu',
+					widget: 'Menu'
+				}
+			],
 			router: (segments, queryParams) => {
+				switch (queryParams.settings) {
+					case undefined:
+						break;
+					case 'users':
+						return {
+							widget: FL_WIDGETS.FLUsersList,
+						};
+					case 'permissions':
+						return {
+							widget: FL_WIDGETS.FLPermissionsList,
+						}
+
+				}
+
 				switch (segments[0]) {
 					case undefined:
 						return ({
@@ -50,13 +100,14 @@ export class DashboardComponent {
 				}
 			}
 		}),
+		...this.menuWidgets,
 		...this.homeWidgets
 	};
 
 	constructor(
 		private language: LanguageService,
 		private flamelink: AngularFlamelink,
-		private flWidgets: FlamelinkWidgets,
+		private flWidgets: FLWidgets,
 		private splitDashboard: SplitDashboard
 	) { }
 

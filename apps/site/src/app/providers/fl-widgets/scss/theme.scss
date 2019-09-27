@@ -1,0 +1,23 @@
+widget-form {
+	.form-title {
+		font-size: 2.2em;
+	}
+	widget-form {
+		.form-title {
+			font-size: 2em;
+		}
+		widget-form {
+			.form-title {
+				font-size: 1.8em;
+			}
+		}
+		widget-form {
+			.form-title {
+				font-size: 1.2em;
+			}
+		}
+	}
+}
+
+.hint {
+}
