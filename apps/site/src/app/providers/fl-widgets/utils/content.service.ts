@@ -76,7 +76,7 @@ export class FLContentService {
       .valueChanges()
       .pipe(
         map((result: any) => result && result[0] && result[0].fields),
-        map((result: any) => result && result.map(field => ({ ...field, localized: this.settings.localized, schema }))),
+        map((result: any) => result && result.map(field => ({ ...field, localized: this.settings.localized && this.settings.localized + '.SCHEMAS.' + schema, schema }))),
         switchMap((fields: any) => {
           return this.flSchemaToAutoForm(fields || []);
         })
@@ -114,7 +114,6 @@ export class FLContentService {
                 'radio': FL_WIDGETS.FLFieldRadio,
               };
 
-
               if (['fieldset', 'select', 'repeater'].indexOf(field.type) >= 0) {
                 field.options = (field.options || []).map(option => ({
                   ...option,
@@ -122,9 +121,10 @@ export class FLContentService {
                   localized: field.localized + '.' + field.key,
                 }))
               }
+
               field.name = field.key;
-              field.label = localized ? translation ? translation.title : (localized + '.' + field.key + '.title') : field.title;
-              field.description = localized ? translation ? translation.description : (localized + '.' + field.key + '.description') : field.description;
+              field.label = localized && translation && translation.title || field.title;
+              field.description = localized && translation && translation.description || field.description;
               field.validators = []
 
               const rules: any[] = field.constraints || [];

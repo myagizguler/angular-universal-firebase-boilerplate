@@ -50,7 +50,9 @@ export class FLFieldsWidgets {
                     ),
                     map(
                         translations => field.options.map(option => {
-                            return { value: option.value, label: translations ? translations[option.value] ? translations[option.value].title : (field.localized + '.' + field.key + '.' + option.value + '.title') : option.label };
+                            return {
+                                value: option.value, label: translations && translations[option.value] && translations[option.value].title || option.label
+                            };
                         })
                     )
                 )
@@ -71,10 +73,9 @@ export class FLFieldsWidgets {
                             : Promise.resolve(null)
                     ),
                     map(
-                        // translations => field.options.map(option => ({ key: option.key, label: option.title })),
                         translations => field.options.map(option => ({
                             key: option.key,
-                            label: translations ? translations[option.key] ? translations[option.key].title : (field.localized + '.' + field.key + '.' + option.key + '.title') : option.label
+                            label: translations && translations[option.key] && translations[option.key].title || option.label
                         }))
 
                     )
@@ -97,44 +98,44 @@ export class FLFieldsWidgets {
                 ]
 
             }),
-            FLFieldRepeaterDeprecated: ({ field }) => field && ({
-                ...field,
-                type: 'repeater',
-                buttons: [
-                    (list) => ({
-                        widget: FL_WIDGETS.FLRepeaterFormButton,
-                        params: { list, fields: this.flContent.flSchemaToAutoForm(field.options) }
-                    })
-                ],
-                widget: (row) => {
-                    const titleFields = field.options.filter(option => option.type === 'text' || option.type === 'textarea');
-                    const titleField = titleFields.length && titleFields[0];
-                    return {
-                        widget: FL_WIDGETS.FLRepeaterCard,
-                        params: {
-                            row,
-                            fields: this.flContent.flSchemaToAutoForm(field.options),
-                            title: titleField && row.data[titleField.key]
-                        }
-                    };
-                }
+            // FLFieldRepeaterDeprecated: ({ field }) => field && ({
+            //     ...field,
+            //     type: 'repeater',
+            //     buttons: [
+            //         (list) => ({
+            //             widget: FL_WIDGETS.FLRepeaterFormButton,
+            //             params: { list, fields: this.flContent.flSchemaToAutoForm(field.options) }
+            //         })
+            //     ],
+            //     widget: (row) => {
+            //         const titleFields = field.options.filter(option => option.type === 'text' || option.type === 'textarea');
+            //         const titleField = titleFields.length && titleFields[0];
+            //         return {
+            //             widget: FL_WIDGETS.FLRepeaterCard,
+            //             params: {
+            //                 row,
+            //                 fields: this.flContent.flSchemaToAutoForm(field.options),
+            //                 title: titleField && row.data[titleField.key]
+            //             }
+            //         };
+            //     }
 
-            }),
-            FLRepeaterCard: ({ row, title, fields }) => ({
-                type: 'card',
-                cssClass: 'my-3',
-                title,
-                buttons: [
-                    ({
-                        widget: FL_WIDGETS.FLRepeaterDeleteButton,
-                        params: { row }
-                    }),
-                    ({
-                        widget: FL_WIDGETS.FLRepeaterFormButton,
-                        params: { row, fields }
-                    })
-                ]
-            }),
+            // }),
+            // FLRepeaterCard: ({ row, title, fields }) => ({
+            //     type: 'card',
+            //     cssClass: 'my-3',
+            //     title,
+            //     buttons: [
+            //         ({
+            //             widget: FL_WIDGETS.FLRepeaterDeleteButton,
+            //             params: { row }
+            //         }),
+            //         ({
+            //             widget: FL_WIDGETS.FLRepeaterFormButton,
+            //             params: { row, fields }
+            //         })
+            //     ]
+            // }),
             FLRepeaterDeleteButton: ({ row }) => ({
                 type: 'button',
                 title: '',
@@ -189,7 +190,7 @@ export class FLFieldsWidgets {
                     map(
                         translations => field.options.map(option => ({
                             value: option.value,
-                            label: translations ? translations[option.value] ? translations[option.value].title : (field.localized + '.' + field.key + '.' + option.value + '.title') : option.label
+                            label: translations && translations[option.value] && translations[option.value].title || option.label
                         }))
                     )
                 )
@@ -227,47 +228,52 @@ export class FLFieldsWidgets {
                         params: { row }
                     };
                 },
-                buttons: [(list) => ({
-                    widget: FL_WIDGETS.FLFileInput,
-                    params: {
-                        label: field.localized + '.upload',
-                        onChange: (filelist: FileList) => {
-                            const watchFiles = [];
-                            for (let i = 0; i < filelist.length; i++) {
-                                watchFiles.push(filelist.item(i));
-                            }
-
-                            const observables = watchFiles.map(file => this.flMedia.uploadFile(file, field.schema));
-
-                            combineLatest(observables).subscribe(
-                                pendingFiles => {
-                                    const listValue = list.value
-                                        ? list.value.filter(rowData => !!rowData.id)
-                                        : [];
-                                    list.set([...pendingFiles, ...listValue]);
-                                },
-                                error => {
-
-                                    console.log('error', error);
-                                },
-                                () => {
-                                    setTimeout(() => {
-                                        list.value
-                                            ? list.set(list.value.map(rowData => {
-                                                // console.log(rowData);
-                                                if (rowData.value) {
-                                                    return rowData.value;
-                                                }
-                                                return rowData;
-                                            }))
-                                            : list.set([]);
-                                    }, 50)
+                buttons: this.flSettings.languageChanges.pipe(
+                    switchMap(
+                        () => field.localized
+                            ? this.translate.get(field.localized + '.' + field.key)
+                            : Promise.resolve(null)
+                    ),
+                    map(
+                        translations => [(list) => {
+                            console.log(translations);
+                            return ({
+                                widget: FL_WIDGETS.FLFileInput,
+                                params: {
+                                    label: translations && translations.upload || 'Upload',
+                                    onChange: (filelist: FileList) => {
+                                        const watchFiles = [];
+                                        for (let i = 0; i < filelist.length; i++) {
+                                            watchFiles.push(filelist.item(i));
+                                        }
+                                        const observables = watchFiles.map(file => this.flMedia.uploadFile(file, field.schema));
+                                        combineLatest(observables).subscribe(pendingFiles => {
+                                            const listValue = list.value
+                                                ? list.value.filter(rowData => !!rowData.id)
+                                                : [];
+                                            list.set([...pendingFiles, ...listValue]);
+                                        }, error => {
+                                            console.log('error', error);
+                                        }, () => {
+                                            setTimeout(() => {
+                                                list.value
+                                                    ? list.set(list.value.map(rowData => {
+                                                        if (rowData.value) {
+                                                            return rowData.value;
+                                                        }
+                                                        return rowData;
+                                                    }))
+                                                    : list.set([]);
+                                            }, 50);
+                                        });
+                                    }
                                 }
-                            )
-                        }
-                    }
+                            });
+                        }]
 
-                })]
+                    )
+                )
+
             }),
             FLFieldMarkdown: ({ field }) => field && ({
                 ...field,

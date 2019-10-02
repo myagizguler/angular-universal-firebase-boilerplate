@@ -64,7 +64,8 @@ export class DashboardComponent {
 	public widgets: Widgets = {
 		...this.flWidgets.widgets({
 			languageObservable: this.language.change,
-			routePrefix: this.routePrefix
+			routePrefix: this.routePrefix,
+			localized: 'DATABASE',
 		}),
 		...this.splitDashboard.widgets({
 			login: (email, password) => this.flamelink.auth.auth.signInWithEmailAndPassword(email, password),
@@ -100,12 +101,12 @@ export class DashboardComponent {
 							case 'collection':
 								return {
 									widget: FL_WIDGETS.FLCollectionList,
-									params: { schema: segments[2] }
+									params: { schema: segments[2], limit: 20 }
 								}
 							case 'form':
 								return {
 									widget: FL_WIDGETS.FLCollectionList,
-									params: { schema: segments[2] }
+									params: { schema: segments[2], limit: 20 }
 								}
 							case 'single':
 								return {

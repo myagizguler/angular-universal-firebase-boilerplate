@@ -128,7 +128,7 @@ export class SplitDashboard {
 				type: 'layout',
 				cols: [
 					{
-						titleClass: 'h4 text-dark px-3',
+						titleClass: 'h4 text-dark',
 						title: 'Admin',
 						widget: ''
 					},
@@ -147,11 +147,11 @@ export class SplitDashboard {
 			}),
 			BodyWrapper: () => ({
 				type: 'layout',
-				containerClass: 'p-3',
+				containerClass: 'p-3 ml-0',
 				rowClass: 'm-0',
 				cols: [
 					{
-						colClass: 'col-12 px-0 py-3',
+						colClass: 'col-12 py-3',
 						widget: 'DashboardHeader'
 					},
 					{
