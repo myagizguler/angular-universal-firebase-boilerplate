@@ -3,9 +3,9 @@ import { AngularFlamelink } from 'angular-flamelink';
 import { Widget, DynamicWidget } from 'open-dashboard';
 import { FL_WIDGETS } from '../widgets';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { switchMap, map, tap } from 'rxjs/operators';
-import { FLLanguageService } from './language.service';
+import { FLSettingsService } from './settings.service';
 import { Validators } from '@angular/forms';
 
 @Injectable({
@@ -16,55 +16,115 @@ export class FLContentService {
   constructor(
     private flamelink: AngularFlamelink,
     private translate: TranslateService,
-    private language: FLLanguageService
+    private settings: FLSettingsService
   ) { }
+
+  public formatField(doc: any, field: any) {
+    let html = '';
+    switch (field.type) {
+      case 'fieldset':
+        const data: Record<string, any> = this.formatDocument(doc, field.overviewFields.map(overviewField => field.options.find(option => option.key === overviewField))) || {};
+        for (const key in data) {
+          if (data.hasOwnProperty(key)) {
+            html += '<div class="fl-overview-field-wrapper">'
+            html += `<div class="fl-overview-field-key">${field.options.find(option => option.key === key).title}</div>`
+            html += `<div class="fl-overview-field-value">${data[key]}</div>`
+            html += '</div>'
+          }
+        };
+        break;
+      case 'media':
+        (doc || []).forEach(file => {
+          html += `<img src="${file.url}" class="fl-listing-image my-1 mr-1"/>`
+        })
+        break;
+      default:
+        html = doc;
+    };
+    return html;
+  }
+
+  public formatDocument(doc: Record<string, any>, fields: any[]) {
+    const formattedDoc = {};
+    fields.map(field => {
+      formattedDoc[field.key] = this.formatField(doc[field.key], field)
+    });
+    return formattedDoc;
+
+  }
+
+  public formatDocuments(docs: Record<string, any>[], fields: any[]) {
+    const formatted = docs.map(doc => ({ id: doc.id, ...this.formatDocument(doc, fields) }));
+    console.log(formatted);
+    return formatted;
+  }
 
   public async getOverviewFields(schemaName: string) {
     const fields = schemaName ? await this.flamelink.schemas.getFields({
       schemaKey: schemaName,
     }) : null;
     if (fields) {
-      return fields.filter(field =>
-        field.show &&
-        (['text', 'email', 'markdown-editor', 'number', 'select'].indexOf(field.type) >= 0)
-      ).map(field => field.key);
+      return fields.filter(field => field.show);
     }
     return [];
   }
 
-  public getSchemaAutoForm(schemaName: string, localized?: string) {
+  public getSchemaAutoForm(schema: string) {
 
     return this.flamelink.angularFire
-      .collection('fl_schemas', q => q.where('id', '==', schemaName))
+      .collection('fl_schemas', q => q.where('id', '==', schema))
       .valueChanges()
       .pipe(
         map((result: any) => result && result[0] && result[0].fields),
+        map((result: any) => result && result.map(field => ({ ...field, localized: this.settings.localized, schema }))),
         switchMap((fields: any) => {
-          return this.flSchemaToAutoForm(fields || [], localized, schemaName);
+          return this.flSchemaToAutoForm(fields || []);
         })
       );
 
   }
 
-  public flSchemaToAutoForm(fields: any[], localized?: string, schemaKey?: string) {
-    const languageChange = localized
-      ? this.language.valueChanges.pipe(switchMap(() => this.translate.get(localized)))
-      : new Observable(observer => observer.next())
+  public flSchemaToAutoForm(fields: any[]) {
 
-    return languageChange.pipe(
-      map(
+    const fieldWidgets = fields
+      .map((field) => {
 
-        translations => {
-          const fieldWidgets = fields
-            .map((field) => {
+        const localized = field.localized + '.' + field.key;
+
+        const languageChange = localized
+          ? this.settings.languageChanges.pipe(switchMap(() => this.translate.get(localized)))
+          : new Observable(observer => observer.next())
+
+        return languageChange.pipe(
+          map(
+
+            translation => {
+              const widgetNames = {
+                'fieldset': FL_WIDGETS.FLForm,
+                'date': FL_WIDGETS.FLFieldDate,
+                'time': FL_WIDGETS.FLFieldDate,
+                'datetime-local': FL_WIDGETS.FLFieldDate,
+                'select': FL_WIDGETS.FLFieldSelect,
+                'repeater': FL_WIDGETS.FLFieldRepeater,
+                'select-relational': FL_WIDGETS.FLFieldSelectRelational,
+                'markdown-editor': FL_WIDGETS.FLFieldMarkdown,
+                'media': FL_WIDGETS.FLFieldMedia,
+                'text': FL_WIDGETS.FLFieldText,
+                'boolean': FL_WIDGETS.FLFieldBoolean,
+                'radio': FL_WIDGETS.FLFieldRadio,
+              };
 
 
-              field.name = field.key;
-              if (schemaKey) {
-                field.schema = schemaKey;
+              if (['fieldset', 'select', 'repeater'].indexOf(field.type) >= 0) {
+                field.options = (field.options || []).map(option => ({
+                  ...option,
+                  schema: field.schema,
+                  localized: field.localized + '.' + field.key,
+                }))
               }
-              field.label = localized ? translations[field.key] ? translations[field.key].title : (localized + '.' + field.key + '.title') : field.title;
-              field.description = localized ? translations[field.key] ? translations[field.key].description : (localized + '.' + field.key + '.description') : field.description;
+              field.name = field.key;
+              field.label = localized ? translation ? translation.title : (localized + '.' + field.key + '.title') : field.title;
+              field.description = localized ? translation ? translation.description : (localized + '.' + field.key + '.description') : field.description;
               field.validators = []
 
               const rules: any[] = field.constraints || [];
@@ -104,21 +164,6 @@ export class FLContentService {
                 }
               });
 
-              const widgetNames = {
-                'fieldset': FL_WIDGETS.FLForm,
-                'date': FL_WIDGETS.FLFieldDate,
-                'time': FL_WIDGETS.FLFieldDate,
-                'datetime-local': FL_WIDGETS.FLFieldDate,
-                'select': FL_WIDGETS.FLFieldSelect,
-                'repeater': FL_WIDGETS.FLFieldRepeater,
-                'select-relational': FL_WIDGETS.FLFieldSelectRelational,
-                'markdown-editor': FL_WIDGETS.FLFieldMarkdown,
-                'media': FL_WIDGETS.FLFieldMedia,
-                'text': FL_WIDGETS.FLFieldText,
-                'boolean': FL_WIDGETS.FLFieldBoolean,
-                'radio': FL_WIDGETS.FLFieldRadio,
-              };
-
               const widget: DynamicWidget = {
                 ...field,
                 type: 'dynamic',
@@ -130,19 +175,18 @@ export class FLContentService {
               widget.widget = (type) => {
                 return ({
                   widget: widgetNames[type] || widgetNames['text'],
-                  params: { field, localized }
+                  params: { field }
                 });
               };
 
               return widget;
-            });
+            }
+          )
+        )
 
-          return fieldWidgets;
-        }
-      )
-    )
+      });
 
-
+    return combineLatest(fieldWidgets);
 
   }
 

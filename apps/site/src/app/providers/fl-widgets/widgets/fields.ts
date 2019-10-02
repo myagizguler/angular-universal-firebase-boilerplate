@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Widgets, CardWidget } from 'open-dashboard';
+import { Widgets, CardWidget, WidgetLinker, RepeaterList } from 'open-dashboard';
 import { AngularFlamelink } from 'angular-flamelink';
 import { FL_WIDGETS } from './index';
 import { FLContentService } from '../utils/content.service';
 import { map, switchMap } from 'rxjs/operators';
-import { combineLatest } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { FLMediaService } from '../utils/media.service';
-import { FLLanguageService } from '../utils/language.service';
+import { FLSettingsService } from '../utils/settings.service';
 import { TranslateService } from '@ngx-translate/core';
 import { countries } from '../utils/countries.object';
 
@@ -18,18 +18,18 @@ export class FLFieldsWidgets {
     constructor(
         private flamelink: AngularFlamelink,
         private flContent: FLContentService,
-        private flLanguage: FLLanguageService,
+        private flSettings: FLSettingsService,
         private translate: TranslateService,
         private flMedia: FLMediaService
     ) { }
 
     public get(): Widgets {
         return {
-            FLForm: ({ field, localized }) => field && ({
+            FLForm: ({ field }) => field && ({
                 ...field,
                 type: 'form',
                 fieldClass: 'py-3',
-                fields: this.flContent.flSchemaToAutoForm(field.options, localized && (localized + '.' + field.key), field.schema),
+                fields: this.flContent.flSchemaToAutoForm(field.options),
             }),
             FLFieldText: ({ field }) => field && ({
                 ...field,
@@ -39,18 +39,18 @@ export class FLFieldsWidgets {
                 ...field,
                 type: 'slide-toggle',
             }),
-            FLFieldRadio: ({ field, localized }) => field && ({
+            FLFieldRadio: ({ field }) => field && ({
                 ...field,
                 type: 'radio-input',
-                options: this.flLanguage.valueChanges.pipe(
+                options: this.flSettings.languageChanges.pipe(
                     switchMap(
-                        () => localized
-                            ? this.translate.get(localized + '.' + field.key)
+                        () => field.localized
+                            ? this.translate.get(field.localized + '.' + field.key)
                             : Promise.resolve(null)
                     ),
                     map(
                         translations => field.options.map(option => {
-                            return { value: option.value, label: translations ? translations[option.value] ? translations[option.value].title : (localized + '.' + field.key + '.' + option.value + '.title') : option.label };
+                            return { value: option.value, label: translations ? translations[option.value] ? translations[option.value].title : (field.localized + '.' + field.key + '.' + option.value + '.title') : option.label };
                         })
                     )
                 )
@@ -61,13 +61,49 @@ export class FLFieldsWidgets {
             }),
 
             // Repeater
-            FLFieldRepeater: ({ field, localized }) => field && ({
+            FLFieldRepeater: ({ field }) => field && ({
+                ...field,
+                type: 'mat-table',
+                cols: this.flSettings.languageChanges.pipe(
+                    switchMap(
+                        () => field.localized
+                            ? this.translate.get(field.localized + '.' + field.key)
+                            : Promise.resolve(null)
+                    ),
+                    map(
+                        // translations => field.options.map(option => ({ key: option.key, label: option.title })),
+                        translations => field.options.map(option => ({
+                            key: option.key,
+                            label: translations ? translations[option.key] ? translations[option.key].title : (field.localized + '.' + field.key + '.' + option.key + '.title') : option.label
+                        }))
+
+                    )
+                ),
+                buttons: [
+                    (list) => ({
+                        widget: FL_WIDGETS.FLRepeaterFormButton,
+                        params: { list, fields: this.flContent.flSchemaToAutoForm(field.options) }
+                    })
+                ],
+                rowButtons: [
+                    (row) => ({
+                        widget: FL_WIDGETS.FLRepeaterDeleteButton,
+                        params: { row }
+                    }),
+                    (row) => ({
+                        widget: FL_WIDGETS.FLRepeaterFormButton,
+                        params: { row, fields: this.flContent.flSchemaToAutoForm(field.options) }
+                    })
+                ]
+
+            }),
+            FLFieldRepeaterDeprecated: ({ field }) => field && ({
                 ...field,
                 type: 'repeater',
                 buttons: [
                     (list) => ({
                         widget: FL_WIDGETS.FLRepeaterFormButton,
-                        params: { list, fields: this.flContent.flSchemaToAutoForm(field.options, localized && (localized + '.' + field.key), field.schema) }
+                        params: { list, fields: this.flContent.flSchemaToAutoForm(field.options) }
                     })
                 ],
                 widget: (row) => {
@@ -77,7 +113,7 @@ export class FLFieldsWidgets {
                         widget: FL_WIDGETS.FLRepeaterCard,
                         params: {
                             row,
-                            fields: this.flContent.flSchemaToAutoForm(field.options, localized && (localized + '.' + field.key), field.schema),
+                            fields: this.flContent.flSchemaToAutoForm(field.options),
                             title: titleField && row.data[titleField.key]
                         }
                     };
@@ -101,7 +137,7 @@ export class FLFieldsWidgets {
             }),
             FLRepeaterDeleteButton: ({ row }) => ({
                 type: 'button',
-                title: 'Remove',
+                title: '',
                 icon: 'remove',
                 action: () => {
                     row.remove();
@@ -109,8 +145,8 @@ export class FLFieldsWidgets {
             }),
             FLRepeaterFormButton: ({ row, list, fields }) => ({
                 type: 'button',
-                cssClass: 'mt-3',
-                title: row ? 'Update' : 'Add',
+                // cssClass: 'mt-3',
+                title: row ? '' : 'Add',
                 icon: row ? 'edit' : 'add',
                 style: row ? 'button' : 'raised-button',
                 popup: {
@@ -141,19 +177,20 @@ export class FLFieldsWidgets {
             }),
 
 
-            FLFieldSelect: ({ field, localized }) => field && ({
+            FLFieldSelect: ({ field }) => field && ({
                 ...field,
                 type: 'select-input',
-                options: this.flLanguage.valueChanges.pipe(
+                options: this.flSettings.languageChanges.pipe(
                     switchMap(
-                        () => localized
-                            ? this.translate.get(localized + '.' + field.key)
+                        () => field.localized
+                            ? this.translate.get(field.localized + '.' + field.key)
                             : Promise.resolve(null)
                     ),
                     map(
-                        translations => field.options.map(option => {
-                            return { value: option.value, label: translations ? translations[option.value] ? translations[option.value].title : (localized + '.' + field.key + '.' + option.value + '.title') : option.label };
-                        })
+                        translations => field.options.map(option => ({
+                            value: option.value,
+                            label: translations ? translations[option.value] ? translations[option.value].title : (field.localized + '.' + field.key + '.' + option.value + '.title') : option.label
+                        }))
                     )
                 )
 
@@ -162,7 +199,7 @@ export class FLFieldsWidgets {
                 ...field,
                 type: 'select-input',
                 options: (field.relation === 'countries')
-                    ? this.flLanguage.valueChanges.pipe(map(
+                    ? this.flSettings.languageChanges.pipe(map(
                         lang => [
                             { value: '', label: '' },
                             ...countries.map(country => ({
@@ -193,6 +230,7 @@ export class FLFieldsWidgets {
                 buttons: [(list) => ({
                     widget: FL_WIDGETS.FLFileInput,
                     params: {
+                        label: field.localized + '.upload',
                         onChange: (filelist: FileList) => {
                             const watchFiles = [];
                             for (let i = 0; i < filelist.length; i++) {
@@ -206,9 +244,7 @@ export class FLFieldsWidgets {
                                     const listValue = list.value
                                         ? list.value.filter(rowData => !!rowData.id)
                                         : [];
-                                    // console.log('pendingFiles', list.value.filter(rowData => !!rowData.id));
                                     list.set([...pendingFiles, ...listValue]);
-                                    // observer.next(buttons());
                                 },
                                 error => {
 
@@ -226,20 +262,8 @@ export class FLFieldsWidgets {
                                             }))
                                             : list.set([]);
                                     }, 50)
-                                    // list.value
-                                    //     ? list.set(list.value.map(rowData => {
-                                    //         // console.log(rowData);
-                                    //         if (rowData.value) {
-                                    //             return rowData.value;
-                                    //         }
-                                    //         return rowData;
-                                    //     }))
-                                    //     : list.set([]);
-
                                 }
                             )
-
-
                         }
                     }
 
@@ -275,12 +299,12 @@ export class FLFieldsWidgets {
             }),
 
             // Files
-            FLFileInput: ({ onChange, localized }) => ({
+            FLFileInput: ({ onChange, label }) => ({
                 type: 'file-input',
                 icon: 'cloud_upload',
                 cssClass: 'mt-3',
                 onChange,
-                label: localized ? localized + '.upload' : 'Upload',
+                label
             }),
             FLFileCard: async ({ row }) => {
                 let image: string;

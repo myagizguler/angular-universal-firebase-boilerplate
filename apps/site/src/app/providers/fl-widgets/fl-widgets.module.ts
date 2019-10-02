@@ -6,7 +6,7 @@ import { FLContentWidgets } from './widgets/content';
 import { FLMediaService } from './utils/media.service';
 import { FLContentService } from './utils/content.service';
 import { FLFieldsWidgets } from './widgets/fields';
-import { FLLanguageService } from './utils/language.service';
+import { FLSettingsService } from './utils/settings.service';
 
 @NgModule({
   imports: [
@@ -22,7 +22,7 @@ import { FLLanguageService } from './utils/language.service';
     // Utils
     FLMediaService,
     FLContentService,
-    FLLanguageService,
+    FLSettingsService,
   ]
 })
 export class FLWidgetsModule { }

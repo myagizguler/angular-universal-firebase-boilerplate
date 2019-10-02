@@ -1,23 +1,52 @@
-widget-form {
-	.form-title {
-		font-size: 2.2em;
-	}
+widget {
 	widget-form {
 		.form-title {
-			font-size: 2em;
+			font-size: 2.2em;
 		}
 		widget-form {
 			.form-title {
-				font-size: 1.8em;
+				font-size: 2em;
 			}
-		}
-		widget-form {
-			.form-title {
-				font-size: 1.2em;
+			widget-form {
+				.form-title {
+					font-size: 1.8em;
+				}
+			}
+			widget-form {
+				.form-title {
+					font-size: 1.2em;
+				}
 			}
 		}
 	}
-}
 
-.hint {
+	.fl-collection-listing-wrapper {
+		.mat-form-field-underline {
+			display: none;
+		}
+		.fl-listing-image {
+			max-width: 100px;
+			max-height: 100px;
+			border-radius: 4px;
+		}
+	}
+
+	mat-table-widget {
+		mat-footer-row,
+		mat-header-row,
+		mat-row {
+			align-items: start;
+		}
+	}
+
+	.fl-overview-field-wrapper {
+		padding: 6px 0;
+		.fl-overview-field-key {
+			text-transform: uppercase;
+			font-size: 0.7em;
+			opacity: 0.7;
+		}
+		.fl-overview-field-value {
+		}
+	}
 }

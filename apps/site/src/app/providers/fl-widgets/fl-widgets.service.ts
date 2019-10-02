@@ -4,12 +4,9 @@ import { FLUsersWidgets } from './widgets/users';
 import { FLPermissionsWidgets } from './widgets/permissions';
 import { FLContentWidgets } from './widgets/content';
 import { FLFieldsWidgets } from './widgets/fields';
-import { FLLanguageService } from './utils/language.service';
+import { FLSettingsService, FLDashboardSettings } from './utils/settings.service';
 
-export interface FLDashboardSettings {
-  languageObservable?: Observable<any>;
-  routePrefix?: string;
-}
+
 
 @Injectable({
   providedIn: 'root'
@@ -29,10 +26,11 @@ export class FLWidgets {
       ...settings
     };
 
-    this.language.valueChanges = settings.languageObservable;
+    this.settings.languageChanges = settings.languageObservable;
+    this.settings.localized = settings.localized;
 
     return {
-      ...this.contentWidgets.get(settings.routePrefix),
+      ...this.contentWidgets.get(),
       ...this.permissionsWidgets.get(),
       ...this.usersWidgets.get(),
       ...this.fieldsWidgets.get(),
@@ -41,7 +39,7 @@ export class FLWidgets {
 
 
   constructor(
-    private language: FLLanguageService,
+    private settings: FLSettingsService,
     private fieldsWidgets: FLFieldsWidgets,
     private usersWidgets: FLUsersWidgets,
     private permissionsWidgets: FLPermissionsWidgets,
