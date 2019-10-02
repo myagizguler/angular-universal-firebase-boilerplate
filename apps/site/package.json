@@ -30,7 +30,7 @@
     "firebase": "^6.0.2",
     "flamelink": "^1.0.0-alpha.19",
     "ngx-markdown": "^8.1.0",
-    "open-dashboard": "^0.2.39",
+    "open-dashboard": "^0.2.54",
     "@angular/animations": "~7.2.0",
     "@angular/common": "~7.2.0",
     "@angular/compiler": "~7.2.0",
