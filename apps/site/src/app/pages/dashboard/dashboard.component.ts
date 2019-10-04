@@ -1,7 +1,7 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { Widgets } from 'open-dashboard';
 import { LanguageService } from '../../providers/language/language.service';
-import { FL_WIDGETS, FLWidgets } from '../../providers/fl-widgets';
+import { FL_WIDGETS, FLWidgets } from 'fl-widgets';
 
 @Component({
 	selector: 'app-dashboard',
