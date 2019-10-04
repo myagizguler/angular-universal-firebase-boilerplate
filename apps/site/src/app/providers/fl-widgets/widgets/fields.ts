@@ -80,12 +80,25 @@ export class FLFieldsWidgets {
 
                     )
                 ),
-                buttons: [
-                    (list) => ({
-                        widget: FL_WIDGETS.FLRepeaterFormButton,
-                        params: { list, fields: this.flContent.flSchemaToAutoForm(field.options) }
-                    })
-                ],
+                buttons: this.flSettings.languageChanges.pipe(
+                    switchMap(
+                        () => field.localized
+                            ? this.translate.get(field.localized + '.' + field.key)
+                            : Promise.resolve(null)
+                    ),
+                    map(
+                        translations => [
+                            (list) => ({
+                                widget: FL_WIDGETS.FLRepeaterFormButton,
+                                params: {
+                                    list,
+                                    title: translations && translations.add || 'Add',
+                                    fields: this.flContent.flSchemaToAutoForm(field.options)
+                                }
+                            })
+                        ]
+                    )
+                ),
                 rowButtons: [
                     (row) => ({
                         widget: FL_WIDGETS.FLRepeaterDeleteButton,
@@ -98,44 +111,6 @@ export class FLFieldsWidgets {
                 ]
 
             }),
-            // FLFieldRepeaterDeprecated: ({ field }) => field && ({
-            //     ...field,
-            //     type: 'repeater',
-            //     buttons: [
-            //         (list) => ({
-            //             widget: FL_WIDGETS.FLRepeaterFormButton,
-            //             params: { list, fields: this.flContent.flSchemaToAutoForm(field.options) }
-            //         })
-            //     ],
-            //     widget: (row) => {
-            //         const titleFields = field.options.filter(option => option.type === 'text' || option.type === 'textarea');
-            //         const titleField = titleFields.length && titleFields[0];
-            //         return {
-            //             widget: FL_WIDGETS.FLRepeaterCard,
-            //             params: {
-            //                 row,
-            //                 fields: this.flContent.flSchemaToAutoForm(field.options),
-            //                 title: titleField && row.data[titleField.key]
-            //             }
-            //         };
-            //     }
-
-            // }),
-            // FLRepeaterCard: ({ row, title, fields }) => ({
-            //     type: 'card',
-            //     cssClass: 'my-3',
-            //     title,
-            //     buttons: [
-            //         ({
-            //             widget: FL_WIDGETS.FLRepeaterDeleteButton,
-            //             params: { row }
-            //         }),
-            //         ({
-            //             widget: FL_WIDGETS.FLRepeaterFormButton,
-            //             params: { row, fields }
-            //         })
-            //     ]
-            // }),
             FLRepeaterDeleteButton: ({ row }) => ({
                 type: 'button',
                 title: '',
@@ -144,10 +119,10 @@ export class FLFieldsWidgets {
                     row.remove();
                 }
             }),
-            FLRepeaterFormButton: ({ row, list, fields }) => ({
+            FLRepeaterFormButton: ({ row, title, list, fields }) => ({
                 type: 'button',
                 // cssClass: 'mt-3',
-                title: row ? '' : 'Add',
+                title: title || '',
                 icon: row ? 'edit' : 'add',
                 style: row ? 'button' : 'raised-button',
                 popup: {

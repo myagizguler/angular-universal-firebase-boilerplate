@@ -7,12 +7,16 @@ import { FLMediaService } from './utils/media.service';
 import { FLContentService } from './utils/content.service';
 import { FLFieldsWidgets } from './widgets/fields';
 import { FLSettingsService } from './utils/settings.service';
+import { Dashboard } from './dashboard/dashboard.service';
 
 @NgModule({
   imports: [
 
   ],
   providers: [
+    // Dashboard
+    Dashboard,
+    // Service
     FLWidgets,
     // Widgets
     FLUsersWidgets,

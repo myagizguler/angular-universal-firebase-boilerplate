@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Widgets, FormWidget, Widget } from 'open-dashboard';
 import { AngularFlamelink } from 'angular-flamelink';
 import { FormGroup } from '@angular/forms';
-import { switchMap, map } from 'rxjs/operators';
-import { ReplaySubject } from 'rxjs';
+import { switchMap, map, tap, first } from 'rxjs/operators';
+import { ReplaySubject, combineLatest, Observable } from 'rxjs';
 import { FLContentService } from '../utils/content.service';
 import { FL_WIDGETS } from './index';
 import { FLSettingsService } from '../utils/settings.service';
@@ -82,6 +82,7 @@ export class FLContentWidgets {
             }),
             FLDocumentFormButton: ({ schema, id }) => ({
                 type: 'button',
+                cssClass: 'mx-3',
                 title: id ? '' : 'Create',
                 icon: id ? 'edit' : 'add',
                 style: id ? 'button' : 'raised-button',
@@ -154,101 +155,165 @@ export class FLContentWidgets {
 
             // LISTING
 
-            FLCollectionLoadMoreButton: ({ limitObservable, limit }) => ({
+            FLCollectionLoadMoreButton: ({ limitChange, count }) => ({
                 type: 'button',
                 title: 'Load more',
                 action: () => {
-                    limitObservable.next(limit);
+                    count.total += 20;
+                    limitChange.next(count.total);
                 }
             }),
 
-            FLCollectionList: async ({ schema, limit }) => {
+            FLCollectionExport: ({ schema }) => ({
+                type: 'button',
+                cssClass: 'mx-3',
+                title: 'Export CSV',
+                action: async () => {
+
+                    const data = await this.flamelink.valueChanges({ schemaKey: schema, populate: true }).pipe(first()).toPromise();
+                    const replacer = (key, value) => value === null ? '' : value; // specify how you want to handle null values here
+                    const header = Object.keys(data[0]).filter(key => key !== '_fl_meta_');
+                    let csv = data.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer).replace(/,/g, '-')).join(','));
+                    csv.unshift(header.join(','));
+                    let csvArray = csv.join('\r\n');
+
+                    var a = document.createElement('a');
+                    var blob = new Blob([csvArray], { type: 'text/csv' }),
+                        url = window.URL.createObjectURL(blob);
+
+                    a.href = url;
+                    a.download = schema + '.csv';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+
+
+                }
+            }),
+            FLCollectionList: ({ schema }) => {
+
+                const limitChange = new ReplaySubject<number>();
+                const count = { total: 20 };
+                limitChange.next(20);
+
+                return {
+                    type: 'layout',
+                    containerClass: 'p-0 fl-collection-listing-wrapper',
+                    cols: [
+                        {
+                            colClass: 'col-6',
+                            widget: FL_WIDGETS.FLDocumentFormButton,
+                            params: { schema }
+                        },
+                        {
+                            colClass: 'col-6 text-right',
+                            widget: 'FLCollectionExport',
+                            params: { schema }
+                        },
+                        {},
+                        {
+                            colClass: 'col-12 pb-4',
+                            widget: 'FLCollectionFiltersReader',
+                            params: { schema, limitChange }
+                        },
+                        {
+                            colClass: 'col-12 text-center pb-4',
+                            widget: FL_WIDGETS.FLCollectionLoadMoreButton,
+                            params: { limitChange, count }
+                        },
+
+                    ]
+                } as Widget;
+            },
+            FLCollectionFiltersReader: ({ schema, limitChange }) => ({
+                type: 'params-reader',
+                widget: (segments, params) => ({
+                    widget: 'FLCollectionTable',
+                    params: { schema, segments, params, limitChange }
+                })
+            }),
+            FLCollectionTable: ({ schema, segments, params, limitChange }) => {
+
+                limitChange = limitChange || Promise.resolve(null);
+
                 const queryOptions: any = {
                     schemaKey: schema,
                     orderBy: {
                         field: '_fl_meta_.createdDate',
                         order: 'desc',
                     },
+                    populate: [],
+                    startAt: 0,
                 };
 
-                const limitObservable = new ReplaySubject<number>();
-                if (limit) {
-                    queryOptions.startAt = 0;
-                }
-
-
-                const tabelCols = await this.flContent.getOverviewFields(schema).then(fields => {
+                const cols = new ReplaySubject<any>();
+                this.flContent.getOverviewFields(schema).then(fields => {
                     queryOptions.fields = ['id', ...fields.map(field => field.key)]
-                    queryOptions.populate = true;
-                    return (fields || []).map(field => ({
-                        ...field,
-                        label: field.title
-                    }));
-                });
+                    return (fields || []).map(field => {
+                        queryOptions.populate.push(field.key);
+                        return ({
+                            ...field,
+                            label: field.title
+                        });
+                    });
+                }).then(_cols => cols.next(_cols));
 
-
-                let count = 0;
-                limitObservable.next(limit);
+                const value = combineLatest(
+                    this.settings.languageChanges,
+                    cols,
+                    limitChange
+                ).pipe(
+                    switchMap(([lang, cols, limit]) => {
+                        return this.flamelink.valueChanges<any>({
+                            ...queryOptions,
+                            limit
+                        }).pipe(map(docs => ({ cols, docs })));
+                    }
+                    ),
+                    map(({ cols, docs }) => this.flContent.formatDocuments(docs, cols))
+                )
 
                 return {
-                    type: 'layout',
-                    containerClass: 'p-0 fl-collection-listing-wrapper',
-                    cols: this.settings.languageChanges.pipe(
-                        switchMap(() => limitObservable),
-                        switchMap($limit => this.flamelink.valueChanges<any>({
-                            ...queryOptions,
-                            limit: $limit
-                        })),
-                        switchMap(async (documents) => {
-                            count = documents.length;
-                            return [
-                                {
-                                    colClass: 'col-12 text-right',
-                                    widget: FL_WIDGETS.FLDocumentFormButton,
-                                    params: { schema }
-                                },
-                                {
-                                    colClass: 'col-12 pb-4',
-                                    widget: 'FLCollectionTable',
-                                    params: { schema, value: this.flContent.formatDocuments(documents, tabelCols), cols: tabelCols }
-                                },
-                                {
-                                    colClass: 'col-12 text-center pb-4',
-                                    widget: FL_WIDGETS.FLCollectionLoadMoreButton,
-                                    params: { limitObservable, limit: count + limit }
-                                },
-
-                            ];
+                    type: 'mat-table',
+                    cols,
+                    value,
+                    rowButtons: [
+                        (row) => ({
+                            widget: FL_WIDGETS.FLDocumentFormButton,
+                            params: { schema, id: row.data.id }
                         })
-                    )
-                } as Widget;
+                    ]
+                };
             },
-            FLCollectionTable: ({ schema, value, cols }) => ({
-                type: 'mat-table',
-                cols,
-                value,
-                rowButtons: [
-                    (row) => ({
-                        widget: FL_WIDGETS.FLDocumentFormButton,
-                        params: { schema, id: row.data.id }
-                    })
-                ]
 
-
-            }),
-            FLDocumentCard: ({ schema, id, title, image, subtitle }) => ({
-                type: 'card',
+            // Top Menu
+            FLTopMenu: {
+                type: 'repeater',
+                value: [
+                    { title: 'Content' },
+                    { settings: 'users', title: 'Users' },
+                    { settings: 'permissions', title: 'Permissions' },
+                ],
+                widget: row => ({
+                    widget: 'FLMenuButton',
+                    params: row.data
+                })
+            },
+            FLMenuButton: ({ title, settings }) => ({
+                type: 'button',
                 title,
-                avatar: image,
-                subtitle,
-                buttons: [
-                    {
-                        widget: FL_WIDGETS.FLDocumentFormButton,
-                        params: { schema, id }
+                navigate: {
+                    commands: [],
+                    extras: {
+                        queryParams: settings
+                            ? {
+                                settings,
+                                title
+                            }
+                            : {}
                     }
-                ]
+                }
             }),
-
 
         };
     }

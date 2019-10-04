@@ -37,6 +37,11 @@ widget {
 		mat-row {
 			align-items: start;
 		}
+		mat-header-row {
+			position: sticky;
+			top: 0;
+			z-index: 1;
+		}
 	}
 
 	.fl-overview-field-wrapper {
@@ -47,6 +52,12 @@ widget {
 			opacity: 0.7;
 		}
 		.fl-overview-field-value {
+		}
+	}
+
+	.admin-menu {
+		.repeater-widget {
+			display: inline-block;
 		}
 	}
 }

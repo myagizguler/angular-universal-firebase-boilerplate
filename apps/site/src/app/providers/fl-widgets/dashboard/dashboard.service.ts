@@ -7,9 +7,9 @@ import { LayoutCol } from 'open-dashboard/lib/widgets/ui/layout/layout.interface
 @Injectable({
 	providedIn: 'root'
 })
-export class SplitDashboard {
+export class Dashboard {
 
-	private settings: SplitDashboardSettings = {
+	private settings: DashboardSettings = {
 		routePrefix: 'admin',
 		login: (email, password) => { },
 		logout: () => { },
@@ -126,6 +126,7 @@ export class SplitDashboard {
 			///// BODY
 			DashboardHeader: () => ({
 				type: 'layout',
+				rowClass: 'p-3',
 				cols: [
 					{
 						titleClass: 'h4 text-dark',
@@ -147,15 +148,15 @@ export class SplitDashboard {
 			}),
 			BodyWrapper: () => ({
 				type: 'layout',
-				containerClass: 'p-3 ml-0',
+				containerClass: 'container-fluid m-0 p-0',
 				rowClass: 'm-0',
 				cols: [
 					{
-						colClass: 'col-12 py-3',
+						colClass: 'col-12 m-0 p-0 py-3',
 						widget: 'DashboardHeader'
 					},
 					{
-						colClass: 'col-12 py-5',
+						colClass: 'col-12 m-0 p-0 py-5',
 						widget: 'Router'
 					}
 				]
@@ -175,7 +176,7 @@ export class SplitDashboard {
 		};
 	}
 
-	public widgets(settings: SplitDashboardSettings) {
+	public widgets(settings: DashboardSettings) {
 		this.settings = {
 			...this.settings,
 			...settings
@@ -189,12 +190,12 @@ export class SplitDashboard {
 
 }
 
-export interface SplitDashboardSettings {
-	login: (email: string, password: string) => any;
-	logout: () => any;
+export interface DashboardSettings {
+	login?: (email: string, password: string) => any;
+	logout?: () => any;
 	routePrefix?: string;
-	allowAccess: boolean | Promise<boolean> | Observable<boolean>;
-	router: (segments: string[], queryParams: {
+	allowAccess?: boolean | Promise<boolean> | Observable<boolean>;
+	router?: (segments: string[], queryParams: {
 		[key: string]: any;
 	}) => WidgetLinker;
 	headerCols?: LayoutCol[];
