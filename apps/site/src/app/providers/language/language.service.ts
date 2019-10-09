@@ -14,11 +14,12 @@ export class LanguageService {
 
 	constructor(
 		private translate: TranslateService,
-		@Inject(PLATFORM_ID) private platformId: Object
+		@Inject(PLATFORM_ID) private platformId: Object,
 	) {
 		translate.setDefaultLang(this.defaultLanguage);
 		this.translate.use(this.language);
 		this.change.next(this.language);
+		this.setHtmlTags(this.language);
 	}
 
 	public get language() {
@@ -38,8 +39,26 @@ export class LanguageService {
 		if (isPlatformBrowser(this.platformId)) {
 			localStorage.setItem('language', value);
 		}
+		this.setHtmlTags(value);
 		this.translate.use(value);
 		this.change.next(this.language);
+	}
+
+	private setHtmlTags(lang: string) {
+		try {
+			const langAttr = document.createAttribute('lang');
+			langAttr.value = lang;
+			document.querySelector('html').attributes.setNamedItem(langAttr);
+
+			const dirAttr = document.createAttribute('dir');
+			dirAttr.value = 'ltr';
+			if (lang === 'ar') {
+				dirAttr.value = 'rtl';
+			}
+			document.querySelector('body').className = dirAttr.value;
+			document.querySelector('html').attributes.setNamedItem(dirAttr);
+		} catch (e) { }
+
 	}
 
 }
