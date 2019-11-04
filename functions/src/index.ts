@@ -6,22 +6,6 @@ export * from './ssr';
 flConfig(firebaseApp);
 export const search = flSearchFireFunction;
 
-export const refreshToken = functions.https.onCall(async (data, context) => {
-	if (context.auth && context.auth.uid) {
-		const user = await firestore.collection('fl_users').doc(context.auth.uid).get();
-		const permissionsRef = user.data().permissions;
-		const permissionsId = permissionsRef ? permissionsRef.id : '0';
-		const permissions = permissionsRef ? await permissionsRef.get() : null;
-		const mediaPermissions = permissions ? permissions.data().media : {};
-		await firebaseApp.auth()
-			.setCustomUserClaims(context.auth.uid, {
-				permissions: permissionsId,
-				mediaPermissions
-			});
-		return;
-	}
-});
-
 export const subscribe = functions.https.onCall(async (data, context) => {
 	const subscription = await firestore
 		.collection('fl_content')
