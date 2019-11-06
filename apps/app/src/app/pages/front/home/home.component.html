@@ -1,2 +1,7 @@
-<div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sequi explicabo quo sunt velit tenetur quam non sed! Qui
-  soluta facere magni blanditiis aut aliquid incidunt illo architecto voluptatibus. Consequatur, vitae!</div>
+<button (click)="language.language = 'ar'">Arabic</button>
+<button (click)="language.language = 'en-US'">English</button>
+
+<div *ngFor="let idea of ideas | async">
+  <p>"{{idea.content}}" - <i>{{idea.author}}</i></p>
+
+</div>

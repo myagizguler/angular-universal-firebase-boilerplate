@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { LanguageService } from 'src/app/providers/language/language.service';
+import { DataService } from 'src/app/providers/data/data.service';
 
 @Component({
 	selector: 'app-home',
@@ -7,5 +9,11 @@ import { Component } from '@angular/core';
 })
 export class HomeComponent {
 
+	public ideas = this.data.ideas.get();
+
+	constructor(
+		public language: LanguageService,
+		private data: DataService
+	) { }
 
 }
