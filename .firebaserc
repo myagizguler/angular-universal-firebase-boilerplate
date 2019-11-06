@@ -1,14 +1,14 @@
 {
   "targets": {
-    "app-name": {
+    "bolders-agency": {
       "hosting": {
-        "site": [
-          "app-name"
+        "app": [
+          "site"
         ]
       }
     }
   },
   "projects": {
-    "default": "app-name"
+    "default": "bolders-agency"
   }
 }

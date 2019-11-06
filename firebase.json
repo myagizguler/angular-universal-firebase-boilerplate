@@ -1,8 +1,8 @@
 {
   "hosting": [
     {
-      "target": "site",
-      "public": "public/site",
+      "target": "app",
+      "public": "public/app",
       "ignore": [
         "firebase.json",
         "**/.*",
@@ -11,7 +11,7 @@
       "rewrites": [
         {
           "source": "**",
-          "function": "siteSSR"
+          "function": "appSSR"
         }
       ]
     }
