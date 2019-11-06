@@ -1,21 +1,8 @@
 service firebase.storage {
   match /b/{bucket}/o {
 
-		function isActionPermitted(action) {
-      return (
-   	   request.auth == null
-   	   && action == 'view'
-      ) || (
-   	   request.auth != null 
-    	  && request.auth.token.mediaPermissions[action] == true
-      )
-    }
-    
 		match /{allPaths=**} {
-    	allow read: if isActionPermitted('view');
-      allow update: if isActionPermitted('update');
-      allow create: if isActionPermitted('create');
-      allow delete: if isActionPermitted('delete');
+    	allow read;
 		}
 
   }

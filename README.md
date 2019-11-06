@@ -2,11 +2,6 @@
 
 A Firebase boilerplate for an Angular project with Universal preinstalled and correctly configured to deploy to Firebase Functions and Hosting.
 
-Comes with pre-installed:
-- Bootstrap (SCSS Variables in site/src/assets/scss/bootstrap.scss)
-- Angular Material (SCSS Variables in site/src/assets/scss/material.scss)
-- Angular/Fire (https://github.com/angular/angularfire2)
-
 ## Installation
 
 ```npm
@@ -19,7 +14,7 @@ Navigate to the project's folder
 $ cd YOUR_PROJECT_NAME
 ```
 
-Install dependencies in root, site/ folder and functions/ folder, by running:
+Install dependencies in root, apps/app/ folder and functions/ folder, by running:
 
 ```npm
 $ npm run init
@@ -27,19 +22,19 @@ $ npm run init
 
 ## Usage
 
-A blank Angular app is inside site/ folder. Build Your website there.
+A blank Angular app is inside apps/app/ folder. Build Your website there.
 
 
 ## Development server
 
-Run `npm run serve` for a dev server. This is similar to running `ng serve` inside the /site folder.
+Run `npm run serve` for a dev server. This is similar to running `ng serve` inside the apps/app folder.
 
 ## Production (SSR) server
 
 Make sure you have firebase-tools installed
 
 ```npm
-$ npm i -g firebase-tools
+$ npm i -g firebase-tools@latest
 ```
 
 Login to firebase
