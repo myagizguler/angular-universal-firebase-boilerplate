@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Angulartics2GoogleAnalytics } from 'angulartics2/ga';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,13 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'app';
+
+  constructor(
+    private ga: Angulartics2GoogleAnalytics,
+  ) { }
+
+  ngOnInit() {
+    this.ga.startTracking();
+  }
+
 }

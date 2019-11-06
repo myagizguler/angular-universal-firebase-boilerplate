@@ -1,0 +1,136 @@
+@import "~@angular/material/theming";
+@import "./bootstrap.scss";
+
+// MATERIAL
+
+/* fallback */
+@font-face {
+	font-family: "Material Icons";
+	font-style: normal;
+	font-weight: 400;
+	src: url(https://fonts.gstatic.com/s/materialicons/v48/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2) format("woff2");
+}
+/* fallback */
+@font-face {
+	font-family: "Material Icons Outlined";
+	font-style: normal;
+	font-weight: 400;
+	src: url(https://fonts.gstatic.com/s/materialiconsoutlined/v13/gok-H7zzDkdnRel8-DQ6KAXJ69wP1tGnf4ZGhUcel5euIg.woff2)
+		format("woff2");
+}
+
+.material-icons {
+	font-family: "Material Icons";
+	font-weight: normal;
+	font-style: normal;
+	font-size: 24px;
+	line-height: 1;
+	letter-spacing: normal;
+	text-transform: none;
+	display: inline-block;
+	white-space: nowrap;
+	word-wrap: normal;
+	direction: ltr;
+	-webkit-font-feature-settings: "liga";
+	-webkit-font-smoothing: antialiased;
+}
+
+.material-icons-outlined {
+	font-family: "Material Icons Outlined";
+	font-weight: normal;
+	font-style: normal;
+	font-size: 24px;
+	line-height: 1;
+	letter-spacing: normal;
+	text-transform: none;
+	display: inline-block;
+	white-space: nowrap;
+	word-wrap: normal;
+	direction: ltr;
+	-webkit-font-feature-settings: "liga";
+	-webkit-font-smoothing: antialiased;
+}
+
+//
+
+$matPrimary: (
+	50: #e0ecf2,
+	100: #b3d1de,
+	200: #80b2c8,
+	300: #4d93b2,
+	400: #267ba2,
+	500: #006491,
+	600: #005c89,
+	700: #00527e,
+	800: #004874,
+	900: #003662,
+	A100: #92c6ff,
+	A200: #5fabff,
+	A400: #2c90ff,
+	A700: #1383ff,
+	contrast: (
+		50: #000000,
+		100: #000000,
+		200: #000000,
+		300: #000000,
+		400: #ffffff,
+		500: #ffffff,
+		600: #ffffff,
+		700: #ffffff,
+		800: #ffffff,
+		900: #ffffff,
+		A100: #000000,
+		A200: #000000,
+		A400: #ffffff,
+		A700: #ffffff
+	)
+);
+
+/* For use in src/lib/core/theming/_palette.scss */
+$matAccent: (
+	50: #fce3e7,
+	100: #f7bac3,
+	200: #f18c9b,
+	300: #eb5d73,
+	400: #e73b55,
+	500: #e31837,
+	600: #e01531,
+	700: #dc112a,
+	800: #d80e23,
+	900: #d00816,
+	A100: #fffafa,
+	A200: #ffc7c9,
+	A400: #ff9499,
+	A700: #ff7a80,
+	contrast: (
+		50: #000000,
+		100: #000000,
+		200: #000000,
+		300: #000000,
+		400: #ffffff,
+		500: #ffffff,
+		600: #ffffff,
+		700: #ffffff,
+		800: #ffffff,
+		900: #ffffff,
+		A100: #000000,
+		A200: #000000,
+		A400: #000000,
+		A700: #000000
+	)
+);
+
+$candy-app-primary: mat-palette($matPrimary);
+$candy-app-accent: mat-palette($matAccent);
+$candy-app-warn: mat-palette($matAccent);
+$candy-app-theme: mat-light-theme($candy-app-primary, $candy-app-accent, $candy-app-warn);
+@include angular-material-theme($candy-app-theme);
+
+// Define a custom typography config that overrides the font-family as well as the
+// `headlines` and `body-1` levels.
+$custom-typography: mat-typography-config(
+	$font-family: $font-family-base
+);
+
+// Override typography CSS classes (e.g., mat-h1, mat-display-1, mat-typography, etc.).
+@include mat-core($custom-typography);
