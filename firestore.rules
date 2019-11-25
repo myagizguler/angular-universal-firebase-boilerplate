@@ -27,9 +27,9 @@ service cloud.firestore {
           
     match /fl_content/{document=**} {
       allow read: if isContentPermitted(resource.data._fl_meta_.schema, 'view') ;
-      allow update: if isContentPermitted(resource.data._fl_meta_.schema, 'update');
-      allow create: if isContentPermitted(resource.data._fl_meta_.schema, 'create');
-      allow delete: if isContentPermitted(resource.data._fl_meta_.schema, 'delete');
+      allow update: if isContentPermitted(request.resource.data._fl_meta_.schema, 'update');
+      allow create: if isContentPermitted(request.resource.data._fl_meta_.schema, 'create');
+      allow delete: if isContentPermitted(request.resource.data._fl_meta_.schema, 'delete');
     }
           
     match /fl_environments/{document} {
