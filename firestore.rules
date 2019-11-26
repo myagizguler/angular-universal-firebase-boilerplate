@@ -1,7 +1,9 @@
+rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
   
-  	function guestPermissions() {
+
+    function guestPermissions() {
       return get(/databases/$(database)/documents/fl_permissions/guest).data
     }  
 
@@ -18,7 +20,7 @@ service cloud.firestore {
     }
 
     function isCollectionPermittedProduction(collection, action) {
-      return guestPermissions()[collection].production[action] == true || (request.auth != null && userPermissions([collection].production[action] == true))
+      return guestPermissions()[collection].production[action] == true || (request.auth != null && userPermissions()[collection].production[action] == true)
     }
 
     function isSettingsPermitted(settings, action) {
