@@ -1,10 +1,13 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-  
+ 
+    function isSudo() {
+    	return userPermissions().id == '1';
+    }
 
-    function guestPermissions() {
-      return get(/databases/$(database)/documents/fl_permissions/guest).data
+  	function guestPermissions() {
+      return get(/databases/$(database)/documents/fl_permissions/0).data
     }  
 
     function userPermissions(){
@@ -12,7 +15,7 @@ service cloud.firestore {
     }
 
     function isContentPermitted(schema, action) {
-      return guestPermissions().content.production[schema][action] == true || (request.auth != null && (userPermissions().content.production[schema][action] == true || userPermissions().id == '1'))
+      return guestPermissions().content.production[schema][action] == true || (request.auth != null && (userPermissions().content.production[schema][action] == true || isSudo()))
     }
 
     function isCollectionPermitted(collection, action) {
@@ -31,7 +34,7 @@ service cloud.firestore {
       allow read: if isContentPermitted(resource.data._fl_meta_.schema, 'view') ;
       allow update: if isContentPermitted(request.resource.data._fl_meta_.schema, 'update');
       allow create: if isContentPermitted(request.resource.data._fl_meta_.schema, 'create');
-      allow delete: if isContentPermitted(request.resource.data._fl_meta_.schema, 'delete');
+      allow delete: if isContentPermitted(resource.data._fl_meta_.schema, 'delete');
     }
           
     match /fl_environments/{document} {
@@ -92,9 +95,36 @@ service cloud.firestore {
           
     match /fl_users/{document=**} {
       allow read: if request.auth.uid == resource.id || isCollectionPermitted('users', 'view');
-      allow update: if request.auth.uid == resource.id || isCollectionPermitted('users', 'update');
-      allow create: if isCollectionPermitted('users', 'create');
-      allow delete: if isCollectionPermitted('users', 'delete');
+      allow update: if isSudo()
+      || (
+        request.auth.uid == resource.id
+        && (
+          get(request.resource.data.permissions).id == get(resource.data.permissions).id
+          || get(request.resource.data.permissions).id == '0'
+        )
+      )
+			|| (
+				request.auth.uid != resource.id
+				&& isCollectionPermitted('users', 'update')
+				&& (
+					get(resource.data.permissions).id == userPermissions().id ||
+					get(resource.data.permissions).id == '0'
+				)
+				&& (
+					get(request.resource.data.permissions).id == userPermissions().id ||
+					get(request.resource.data.permissions).id == '0'
+				)
+			)
+      allow create: if isCollectionPermitted('users', 'create') && get(request.resource.data.permissions).id == '0';
+      allow delete: if request.auth.uid == resource.id
+      || (
+      	isCollectionPermitted('users', 'delete')
+        && (
+      		get(request.resource.data.permissions).id == userPermissions().id ||
+					get(request.resource.data.permissions).id == '0' ||
+          isSudo()
+				)
+      );
     }   
           
     match /fl_backups/{document=**} {

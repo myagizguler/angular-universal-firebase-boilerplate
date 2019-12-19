@@ -33,20 +33,7 @@ export class DataToolsService {
 		public flamelink: AngularFlamelink,
 		public recaptchaV3Service: ReCaptchaV3Service,
 		public functions: AngularFireFunctions
-	) {
-		// if (!environment.production) {
-		// 	this.functions.functions.useFunctionsEmulator('http://localhost:5001');
-		// }
-	}
-
-	public getPhotoUrl(id: string, size = '1920_9999_100'): Promise<string> {
-		return id
-			? this.flamelink.storage.getURL({
-				fileId: id,
-				size: { path: size }
-			})
-			: Promise.resolve(null);
-	}
+	) { }
 
 	public combineAndMergeUnique<T extends { id?: string }>(observables: Observable<T[]>[]) {
 		return combineLatest(observables).pipe(

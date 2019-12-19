@@ -1,7 +1,8 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { Widgets } from 'open-dashboard';
 import { LanguageService } from '../../providers/language/language.service';
-import { FLWidgets } from 'fl-widgets';
+import { WidgetsService } from '@ngx-widgets/core';
+import { WidgetsFlamelink } from '@ngx-widgets/flamelink';
+import { WidgetsLegacyComponents } from '@ngx-widgets/legacy';
 
 @Component({
 	selector: 'app-dashboard',
@@ -11,16 +12,22 @@ import { FLWidgets } from 'fl-widgets';
 })
 export class DashboardComponent {
 
-	public widgets: Widgets = {
-		...this.flWidgets.widgets({
-			languageChanges: this.language.change,
-			headerCols: [],
-		}),
-	};
+	public widgets = this.flWidgets.widgets({
+		language: {
+			observe: this.language.change,
+			change: lang => this.language.language = lang
+		},
+	});
 
 	constructor(
 		private language: LanguageService,
-		private flWidgets: FLWidgets,
+		private widgetsService: WidgetsService,
+		private flWidgets: WidgetsFlamelink,
 	) { }
+
+	ngOnInit() {
+		this.widgetsService.extendWidgets(WidgetsLegacyComponents);
+	}
+
 
 }

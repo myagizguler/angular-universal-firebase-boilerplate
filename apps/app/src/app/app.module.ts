@@ -18,7 +18,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     Angulartics2Module.forRoot(),
     ProvidersModule,
   ],
-  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

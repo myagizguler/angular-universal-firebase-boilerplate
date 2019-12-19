@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 
 import { DashboardComponent } from './dashboard.component';
 import { DashboardRoutingModule } from './dashboard-routing.module';
-import { WidgetModule } from 'open-dashboard';
+import { WidgetModule } from '@ngx-widgets/core';
+import { WidgetsLegacyModule } from '@ngx-widgets/legacy';
+import { WidgetsFlamelinkModule } from '@ngx-widgets/flamelink';
 
 @NgModule({
 
@@ -13,7 +15,9 @@ import { WidgetModule } from 'open-dashboard';
 	imports: [
 		CommonModule,
 		DashboardRoutingModule,
-		WidgetModule
+		WidgetModule,
+		WidgetsLegacyModule,
+		WidgetsFlamelinkModule,
 	],
 	exports: [DashboardComponent]
 })

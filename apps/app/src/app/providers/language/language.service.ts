@@ -16,14 +16,11 @@ export class LanguageService {
 		private translate: TranslateService,
 		@Inject(PLATFORM_ID) private platformId: Object,
 	) {
-		translate.setDefaultLang(this.defaultLanguage);
-		this.translate.use(this.language);
-		this.change.next(this.language);
-		this.setHtmlTags(this.language);
+		this.language = this.language;
 	}
 
 	public get language() {
-		let _language;
+		let _language: string;
 
 		if (isPlatformBrowser(this.platformId)) {
 			_language = localStorage.getItem('language');
@@ -38,9 +35,10 @@ export class LanguageService {
 	public set language(value: string) {
 		if (isPlatformBrowser(this.platformId)) {
 			localStorage.setItem('language', value);
+			this.setHtmlTags(value);
 		}
-		this.setHtmlTags(value);
-		this.translate.use(value);
+		this.translate.setDefaultLang(this.defaultLanguage);
+		this.translate.use(value)
 		this.change.next(this.language);
 	}
 
@@ -58,7 +56,7 @@ export class LanguageService {
 			document.querySelector('body').className = dirAttr.value;
 			document.querySelector('html').attributes.setNamedItem(dirAttr);
 		} catch (e) { }
-
 	}
+
 
 }

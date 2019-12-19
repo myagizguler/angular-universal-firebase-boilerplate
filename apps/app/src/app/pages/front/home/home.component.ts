@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { LanguageService } from 'src/app/providers/language/language.service';
 import { DataService } from 'src/app/providers/data/data.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
 	selector: 'app-home',
@@ -9,6 +10,7 @@ import { DataService } from 'src/app/providers/data/data.service';
 })
 export class HomeComponent {
 
+	// public ideas = this.data.ideas.get({ populate: true });
 	public ideas = this.data.ideas.get();
 
 	constructor(
