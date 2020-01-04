@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { LanguageService } from 'src/app/providers/language/language.service';
-import { DataService } from 'src/app/providers/data/data.service';
-import { tap } from 'rxjs/operators';
+import { LanguageService } from '../../../providers/language/language.service';
+import { DataService } from '../../../providers/data/data.service';
 
 @Component({
 	selector: 'app-home',
@@ -10,12 +9,13 @@ import { tap } from 'rxjs/operators';
 })
 export class HomeComponent {
 
-	// public ideas = this.data.ideas.get({ populate: true });
 	public ideas = this.data.ideas.get();
+	// public ideas = this.content.valueChanges({ schemaKey: 'ideas' })
 
 	constructor(
 		public language: LanguageService,
-		private data: DataService
+		private data: DataService,
+		// private content: FLContent
 	) { }
 
 }

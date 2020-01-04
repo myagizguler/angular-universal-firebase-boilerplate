@@ -1,9 +1,9 @@
-import { AngularFlamelink } from 'angular-flamelink';
 import { Observable, combineLatest, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { ReCaptchaV3Service } from 'ng-recaptcha';
 import { AngularFireFunctions } from '@angular/fire/functions';
+import { FLSettings, FLContent } from 'ng-flamelink';
 
 @Injectable({
 	providedIn: 'root'
@@ -25,12 +25,13 @@ export class DataToolsService {
 			this.$languageSubscription.unsubscribe();
 		}
 		this.$languageSubscription = this.$languageObservable.subscribe(language => {
-			this.flamelink.settings.setLocale(language);
+			this.settings.setLocale(language);
 		});
 	}
 
 	constructor(
-		public flamelink: AngularFlamelink,
+		public settings: FLSettings,
+		public content: FLContent,
 		public recaptchaV3Service: ReCaptchaV3Service,
 		public functions: AngularFireFunctions
 	) { }

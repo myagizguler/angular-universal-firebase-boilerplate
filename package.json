@@ -6,8 +6,8 @@
     "init": "npm run package:merge --prefix ./functions && npm i && npm i --prefix ./functions && npm i --prefix ./apps/app",
     "serve": "npm run start --prefix ./apps/app",
     "build:functions": "npm run lint --prefix ./functions && npm run build --prefix ./functions",
-    "build:ssr": "npm run build:ssr --prefix ./apps/app",
-    "build": "npm run build:functions && npm run build:ssr"
+    "build:app": "npm run build:ssr --prefix ./apps/app",
+    "build": "npm run build:functions && npm run build:app"
   },
   "repository": {
     "type": "git",

@@ -7,6 +7,6 @@
 
 <h1>Ideas</h1>
 <div *ngFor="let idea of ideas | async">
-  <p>"{{idea.content}}" - <i>{{idea.author}}</i> - <i>{{idea.media[0].url}}</i></p>
+  <p>"{{idea.content}}" - <i>{{idea.author}}</i> - <i>{{idea.media[0]?.url}}</i></p>
 
 </div>

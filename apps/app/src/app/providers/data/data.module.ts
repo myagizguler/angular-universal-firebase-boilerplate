@@ -1,15 +1,11 @@
 import { NgModule } from '@angular/core';
 import { DataService } from './data.service';
-import { AngularFlamelinkModule } from 'angular-flamelink';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
-import { AngularFireAuthModule } from '@angular/fire/auth';
-import { AngularFireStorageModule } from '@angular/fire/storage';
-import { AngularFlamelinkTextSearchModule } from 'angular-flamelink-text-search';
 import { environment } from '../../../environments/environment';
 import { DataToolsService } from './data-tools.service';
 import { IdeasService } from './models/ideas/ideas.service';
 import { RECAPTCHA_V3_SITE_KEY, RecaptchaV3Module } from 'ng-recaptcha';
+import { FlamelinkModule, FLContentModule, FLStorageModule, FLUsersModule, FLSettingsModule, FLSchemasModule } from 'ng-flamelink';
+import { AngularFireFunctionsModule } from '@angular/fire/functions';
 
 @NgModule({
 	providers: [
@@ -21,12 +17,16 @@ import { RECAPTCHA_V3_SITE_KEY, RecaptchaV3Module } from 'ng-recaptcha';
 		IdeasService,
 	],
 	imports: [
-		AngularFireModule.initializeApp(environment.firebase),
-		AngularFirestoreModule,
-		AngularFireAuthModule,
-		AngularFireStorageModule,
-		AngularFlamelinkModule,
-		AngularFlamelinkTextSearchModule,
+		FlamelinkModule.initialize({
+			firebaseApp: environment.firebase,
+			dbType: 'cf'
+		}),
+		FLContentModule,
+		FLStorageModule,
+		FLUsersModule,
+		FLSchemasModule,
+		FLSettingsModule,
+		AngularFireFunctionsModule,
 		RecaptchaV3Module,
 	]
 })

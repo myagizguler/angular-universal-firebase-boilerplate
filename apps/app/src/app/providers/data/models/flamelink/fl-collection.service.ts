@@ -30,7 +30,7 @@ export class FLCollection<DocType extends FLDocument> {
 	}
 
 	public async add(data: DocType) {
-		const lastDocument = await this.utils.flamelink.valueChanges<DocType>({
+		const lastDocument = await this.utils.content.valueChanges<DocType>({
 			schemaKey: this.options.schemaKey,
 			orderBy: {
 				field: 'order',
@@ -43,7 +43,7 @@ export class FLCollection<DocType extends FLDocument> {
 		).toPromise();
 
 		const order = lastDocument && lastDocument.order && (Number(lastDocument.order) + 1) || 1;
-		return this.utils.flamelink.content.add({
+		return this.utils.content.add({
 			schemaKey: this.options.schemaKey,
 			data: { ...data, order }
 		});
@@ -63,15 +63,15 @@ export class FLCollection<DocType extends FLDocument> {
 	// public get(options: GetOptionsSingle): Observable<DocType>;
 	// public get(options: GetOptionsMultiple): Observable<DocType[]>;
 	public get(options: GetOptionsMultiple = {}) {
-		const result = this.utils.flamelink.valueChanges<DocType>({ ...this.options, ...options } as { schemaKey: string });
+		const result = this.utils.content.valueChanges<DocType[]>({ ...this.options, ...options } as { schemaKey: string });
 		return this.utils.languageObservable.pipe(
 			switchMap(() => result),
-			map(result => result.map(doc => ({ ...doc, ref: this.utils.flamelink.ref(doc.id) })))
+			map(result => result.map(doc => ({ ...doc, ref: this.utils.content.ref(doc.id) })))
 		) as (Observable<DocType[]>);
 	}
 
 	public getById(id: string, options?: GetOptionsSingle) {
-		return id ? this.utils.flamelink.valueChanges<DocType>({ schemaKey: this.options.schemaKey, ...options, entryId: id }) : new Observable<DocType>(o => o.next(null));
+		return id ? this.utils.content.valueChanges<DocType>({ schemaKey: this.options.schemaKey, ...options, entryId: id }) : new Observable<DocType>(o => o.next(null));
 	}
 
 	public watch(options: GetOptionsMultiple = {}) {
