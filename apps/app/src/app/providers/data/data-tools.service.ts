@@ -36,6 +36,17 @@ export class DataToolsService {
 		public functions: AngularFireFunctions
 	) { }
 
+	public async recaptchaPassed(action: string) {
+		const token = await this.recaptchaV3Service.execute(action).toPromise();
+		if (token) {
+			const result = await this.functions.httpsCallable('reCaptcha')({ token }).toPromise();
+			if (result.score > 0.5) {
+				return true;
+			}
+		}
+		throw 'ReCaptcha validation failed.';
+	}
+
 	public combineAndMergeUnique<T extends { id?: string }>(observables: Observable<T[]>[]) {
 		return combineLatest(observables).pipe(
 			map(

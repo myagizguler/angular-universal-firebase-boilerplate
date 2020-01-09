@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IdeasService } from './models/ideas/ideas.service';
+import { IdeasService } from './models/ideas/ideas';
 import { DataToolsService } from './data-tools.service';
 import { AngularFireFunctions } from '@angular/fire/functions';
 

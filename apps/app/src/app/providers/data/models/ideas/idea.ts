@@ -1,4 +1,4 @@
-import { FLDocument } from '../flamelink/fl-document.interface';
+import { FLDocument } from '../flamelink/fl-document';
 
 export interface Idea extends FLDocument {
 	author: string;

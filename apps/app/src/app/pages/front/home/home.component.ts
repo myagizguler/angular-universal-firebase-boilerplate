@@ -9,13 +9,11 @@ import { DataService } from '../../../providers/data/data.service';
 })
 export class HomeComponent {
 
-	public ideas = this.data.ideas.get();
-	// public ideas = this.content.valueChanges({ schemaKey: 'ideas' })
+	public ideas = this.data.ideas.valueChanges();
 
 	constructor(
 		public language: LanguageService,
 		private data: DataService,
-		// private content: FLContent
 	) { }
 
 }

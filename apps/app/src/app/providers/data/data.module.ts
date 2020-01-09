@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { DataService } from './data.service';
 import { environment } from '../../../environments/environment';
 import { DataToolsService } from './data-tools.service';
-import { IdeasService } from './models/ideas/ideas.service';
+import { IdeasService } from './models/ideas/ideas';
 import { RECAPTCHA_V3_SITE_KEY, RecaptchaV3Module } from 'ng-recaptcha';
 import { FlamelinkModule, FLContentModule, FLStorageModule, FLUsersModule, FLSettingsModule, FLSchemasModule } from 'ng-flamelink';
 import { AngularFireFunctionsModule } from '@angular/fire/functions';
@@ -19,7 +19,7 @@ import { AngularFireFunctionsModule } from '@angular/fire/functions';
 	imports: [
 		FlamelinkModule.initialize({
 			firebaseApp: environment.firebase,
-			dbType: 'cf'
+			dbType: 'cf',
 		}),
 		FLContentModule,
 		FLStorageModule,
